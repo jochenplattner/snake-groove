@@ -1,0 +1,5 @@
+{
+	"name": "Snake.Core",
+	"rootNamespace": "Snake.Core",
+	"noEngineReferences": true
+}
