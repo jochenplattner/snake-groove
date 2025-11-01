@@ -2,43 +2,42 @@
 # Git LFS configuration for Unity project Snake Groove
 # ============================================================
 
-# Common binary asset types
+# 🖼️ Common binary asset types (textures, images)
 *.png filter=lfs diff=lfs merge=lfs -text
 *.jpg filter=lfs diff=lfs merge=lfs -text
 *.jpeg filter=lfs diff=lfs merge=lfs -text
 *.tga filter=lfs diff=lfs merge=lfs -text
 *.psd filter=lfs diff=lfs merge=lfs -text
+*.tiff filter=lfs diff=lfs merge=lfs -text
+*.bmp filter=lfs diff=lfs merge=lfs -text
 
-# Audio
+# 🎧 Audio files
 *.wav filter=lfs diff=lfs merge=lfs -text
 *.mp3 filter=lfs diff=lfs merge=lfs -text
 *.ogg filter=lfs diff=lfs merge=lfs -text
+*.flac filter=lfs diff=lfs merge=lfs -text
 
-# Video / animation
+# 🎥 Video / animation clips
 *.mp4 filter=lfs diff=lfs merge=lfs -text
 *.mov filter=lfs diff=lfs merge=lfs -text
-*.anim filter=lfs diff=lfs merge=lfs -text
-*.controller filter=lfs diff=lfs merge=lfs -text
+*.avi filter=lfs diff=lfs merge=lfs -text
 
-# 3D / graphics assets
+# 🧱 3D / model and material assets
 *.fbx filter=lfs diff=lfs merge=lfs -text
 *.blend filter=lfs diff=lfs merge=lfs -text
 *.obj filter=lfs diff=lfs merge=lfs -text
+*.stl filter=lfs diff=lfs merge=lfs -text
 *.prefab filter=lfs diff=lfs merge=lfs -text
 *.mat filter=lfs diff=lfs merge=lfs -text
 
-# Misc Unity binary data
-*.unity filter=lfs diff=lfs merge=lfs -text
-*.asset filter=lfs diff=lfs merge=lfs -text
-*.cubemap filter=lfs diff=lfs merge=lfs -text
+# 🌈 HDR / environment maps
 *.exr filter=lfs diff=lfs merge=lfs -text
 *.hdr filter=lfs diff=lfs merge=lfs -text
+*.cubemap filter=lfs diff=lfs merge=lfs -text
 
-# ============================================================
 # Notes:
-#  - Git LFS должен быть установлен (у тебя он уже есть).
-#  - После добавления .gitattributes выполни:
-#       git lfs install
+# - LFS уже установлен (3.7.0)
+# - После редактирования файла:
 #       git add .gitattributes
-#       git commit -m "chore: add Git LFS tracking for Unity assets"
+#       git commit -m "refactor: optimize Git LFS rules for Snake Groove"
 # ============================================================
