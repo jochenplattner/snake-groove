@@ -1,4 +1,6 @@
-# 🔊 SNAKE Groove — Фаза 0: Полное итоговое резюме&#x20;
+# 🔊 SNAKE Groove — Фаза 0: Полное итоговое резюме
+
+> **Статус:** Фаза 0 завершена **Актуальные версии инструментов:** Unity 6.2 LTS, Visual Studio 2026, .NET 10 LTS **Основной архитектурный документ:** [SNAKE\_ARCHITECTURE.md](./SNAKE_ARCHITECTURE.md) &#x20;
 
 ---
 

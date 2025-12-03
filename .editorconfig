@@ -1,0 +1,125 @@
+root = true
+
+############################
+# Общие правила для проекта
+############################
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+############################
+# C# / Unity стиль
+############################
+
+[*.cs]
+
+# Отступы
+indent_style = space
+indent_size = 4
+tab_width = 4
+
+# Скобки
+csharp_new_line_before_open_brace = all
+csharp_new_line_between_methods = true
+
+# Пробелы
+csharp_space_around_binary_operators = before_and_after
+csharp_space_between_method_declaration_name_and_open_parenthesis = false
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+csharp_space_within_method_call_parentheses = false
+csharp_space_within_method_declaration_parentheses = false
+csharp_space_after_cast = false
+
+# Using-и
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
+
+# var
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_for_locals = true:suggestion
+csharp_style_var_for_complex_types = true:suggestion
+
+# this.
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+# Выражения
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = when_on_single_line:suggestion
+csharp_style_pattern_local_over_anonymous_function = true:suggestion
+csharp_style_inlined_variable_declaration = true:suggestion
+
+################################
+# ИМЕНОВАНИЕ (важно для Unity)
+################################
+
+# ----- Стили -----
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+dotnet_naming_style.camel_case_underscore.capitalization = camel_case
+dotnet_naming_style.camel_case_underscore.required_prefix = _
+
+dotnet_naming_style.camel_case.capitalization = camel_case
+
+dotnet_naming_style.interfaces.capitalization = pascal_case
+dotnet_naming_style.interfaces.required_prefix = I
+
+# ----- Символы -----
+
+# Публичные/защищённые члены (методы, свойства, классы, enum и т.п.)
+dotnet_naming_symbols.public_members.applicable_kinds = class, struct, interface, enum, property, method, event, delegate
+dotnet_naming_symbols.public_members.applicable_accessibilities = public, protected, protected_internal
+dotnet_naming_symbols.public_members.required_modifiers =
+
+# Приватные поля
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields.required_modifiers =
+
+# Константы
+dotnet_naming_symbols.constants.applicable_kinds = field
+dotnet_naming_symbols.constants.applicable_accessibilities = *
+dotnet_naming_symbols.constants.required_modifiers = const
+
+# Интерфейсы
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_symbols.interfaces.applicable_accessibilities = *
+dotnet_naming_symbols.interfaces.required_modifiers =
+
+# Локальные переменные и параметры
+dotnet_naming_symbols.locals_and_parameters.applicable_kinds = local, parameter
+dotnet_naming_symbols.locals_and_parameters.applicable_accessibilities = *
+dotnet_naming_symbols.locals_and_parameters.required_modifiers =
+
+# ----- Правила -----
+
+# Публичные члены: PascalCase
+dotnet_naming_rule.public_members_should_be_pascal_case.symbols = public_members
+dotnet_naming_rule.public_members_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.public_members_should_be_pascal_case.severity = suggestion
+
+# Приватные поля: _camelCase
+dotnet_naming_rule.private_fields_should_be_camel_case_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case_underscore.style = camel_case_underscore
+dotnet_naming_rule.private_fields_should_be_camel_case_underscore.severity = suggestion
+
+# Константы: PascalCase
+dotnet_naming_rule.constants_should_be_pascal_case.symbols = constants
+dotnet_naming_rule.constants_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.constants_should_be_pascal_case.severity = suggestion
+
+# Интерфейсы: IPascalCase
+dotnet_naming_rule.interfaces_should_start_with_i.symbols = interfaces
+dotnet_naming_rule.interfaces_should_start_with_i.style = interfaces
+dotnet_naming_rule.interfaces_should_start_with_i.severity = suggestion
+
+# Локальные и параметры: camelCase
+dotnet_naming_rule.locals_and_parameters_should_be_camel_case.symbols = locals_and_parameters
+dotnet_naming_rule.locals_and_parameters_should_be_camel_case.style = camel_case
+dotnet_naming_rule.locals_and_parameters_should_be_camel_case.severity = suggestion

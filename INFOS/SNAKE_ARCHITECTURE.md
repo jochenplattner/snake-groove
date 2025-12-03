@@ -1,5 +1,10 @@
 # 🎮 Snake Groove — Unified Architecture Specification (v12)
 
+> **Статус:** актуально для Unity 6.2 LTS, Visual Studio 2026, .NET 10 LTS
+> **Фаза проекта:** завершена Фаза 0, начинается Фаза 1 (MVP)
+> **Связанные документы:** [Фаза 0 — итоговый отчёт](./snake_phase_0_summary.md)
+ (v12)
+
 > **Главный архитектурный документ проекта Snake Groove**
 
 ---
@@ -189,7 +194,11 @@
 ---
 
 # 🟦 6. Phase 0 Summary (Integrated)
- Phase 0 Summary (Integrated)
+
+> Подробная версия Phase 0: см. [snake_phase_0_summary.md](./snake_phase_0_summary.md)
+
+
+Phase 0 Summary (Integrated)
 
 ### Installed
 
@@ -213,11 +222,7 @@
 
 ### Remaining tasks at end of Phase 0
 
-0. Core scripts in Unity
-   A. Scene transitions test
-   B. Embedded package creation
-   C. Pure C# core
-   D. Unity integration layer
+0. Core scripts in Unity A. Scene transitions test B. Embedded package creation C. Pure C# core D. Unity integration layer
 
 Phase 1 начинается отсюда.
 
@@ -298,7 +303,7 @@ Clean Architecture • SOLID • TDD • CI/CD
 
 ---
 
-# 🟦 8. AI Development Workflow (NEW)
+# 🟦 8. AI Development Workflow
 
 ## 8.1 Goals
 
@@ -356,7 +361,41 @@ Agent.ReadRepo → Agent.GenerateCode → Agent.Test → Agent.Commit → Agent.
 
 ---
 
-# 🟦 9. Final Notes
+## 9. Coding Style & .editorconfig
+
+Для проекта Snake Groove используется единый стиль кода, зафиксированный в файле `.editorconfig` в корне репозитория.
+
+### 9.1 Базовые правила
+
+- Отступы: **4 пробела**, без табов.
+- Скобки: открывающая `{` **на новой строке** (`csharp_new_line_before_open_brace = all`).
+- Концовка строки: **CRLF**.
+- Кодировка: **UTF-8**.
+- Автоматически:
+  - обрезаются пробелы в конце строк;
+  - добавляется финальная пустая строка в файл;
+  - сортируются и группируются `using` (System — первым).
+
+### 9.2 Именование
+
+- Публичные типы и члены: **PascalCase**  
+  `GameManager`, `SnakeRunner`, `SnakeGameService`.
+- Приватные поля: **_camelCase**  
+  `_snakeSegments`, `_inputService`, `_random`.
+- Интерфейсы: **IPascalCase**  
+  `IGridPos`, `ISnakeGameService`.
+- Константы: **PascalCase**  
+  `MaxSnakeLength`, `DefaultSpeed`.
+
+### 9.3 Инструменты
+
+- Visual Studio 2026 использует **Code Cleanup on Save**, который применяет правила `.editorconfig`.
+- GitHub Copilot / Codex CLI генерируют код в соответствии с этим стилем.
+- Любой участник команды при клонировании репозитория автоматически получает одинаковый стиль без ручной настройки IDE.
+
+---
+
+# 🟦 10. Final Notes
 
 - Документ является *главным источником правды*.
 - Обновляется при завершении каждой фазы.
