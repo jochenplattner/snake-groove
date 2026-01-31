@@ -1,14 +1,17 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class BootLoader : MonoBehaviour
+namespace SnakeGroove.Core
 {
-    [SerializeField]
-    private string _nextSceneName = "MainMenu";
-
-    private void Start()
+    public class BootLoader : MonoBehaviour
     {
-        Debug.Log("[BootLoader] Loading scene: " + _nextSceneName);
-        SceneManager.LoadScene(_nextSceneName);
+        [SerializeField]
+        private string _nextSceneName = "MainMenu";
+
+        private void Start()
+        {
+            Debug.Log("[BootLoader] Loading scene: " + _nextSceneName);
+            SceneManager.LoadScene(_nextSceneName);
+        }
     }
 }

@@ -3,62 +3,65 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-public static class EventBus
+namespace SnakeGroove.Core
 {
-    private static readonly Dictionary<Type, List<Delegate>> _subscribers = new();
-
-    /// <summary>
-    /// Проверка инициализации EventBus и очистка подписчиков.
-    /// </summary>
-    public static void Init()
+    public static class EventBus
     {
-        _subscribers.Clear();
-        Log("EventBus is alive and clear.");
-    }
+        private static readonly Dictionary<Type, List<Delegate>> _subscribers = new();
 
-    public static void Subscribe<T>(Action<T> callback)
-    {
-        var type = typeof(T);
-
-        if (!_subscribers.ContainsKey(type))
+        /// <summary>
+        /// Проверка инициализации EventBus и очистка подписчиков.
+        /// </summary>
+        public static void Init()
         {
-            _subscribers[type] = new List<Delegate>();
+            _subscribers.Clear();
+            Log("EventBus is alive and clear.");
         }
 
-        _subscribers[type].Add(callback);
-        Log($"Subscribe<{type.Name}> (count={_subscribers[type].Count})");
-    }
-
-    public static void Unsubscribe<T>(Action<T> callback)
-    {
-        var type = typeof(T);
-        if (!_subscribers.ContainsKey(type)) return;
-
-        _subscribers[type].Remove(callback);
-        Log($"Unsubscribe<{type.Name}> (count={_subscribers[type].Count})");
-    }
-
-    public static void Publish<T>(T eventData)
-    {
-        var type = typeof(T);
-
-        if (!_subscribers.ContainsKey(type))
+        public static void Subscribe<T>(Action<T> callback)
         {
-            Debug.Log($"Publish<{type.Name}> (no listeners)");
-            return;
+            var type = typeof(T);
+
+            if (!_subscribers.ContainsKey(type))
+            {
+                _subscribers[type] = new List<Delegate>();
+            }
+
+            _subscribers[type].Add(callback);
+            Log($"Subscribe<{type.Name}> (count={_subscribers[type].Count})");
         }
 
-        Log($"Publish<{type.Name}> (listeners={_subscribers[type].Count})");
-
-        foreach (var subscriber in _subscribers[type])
+        public static void Unsubscribe<T>(Action<T> callback)
         {
-            ((Action<T>)subscriber).Invoke(eventData);
-        }
-    }
+            var type = typeof(T);
+            if (!_subscribers.ContainsKey(type)) return;
 
-    [System.Diagnostics.Conditional("UNITY_EDITOR")]
-    private static void Log(string msg)
-    {
-        Debug.Log($"[EventBus] {msg}");
+            _subscribers[type].Remove(callback);
+            Log($"Unsubscribe<{type.Name}> (count={_subscribers[type].Count})");
+        }
+
+        public static void Publish<T>(T eventData)
+        {
+            var type = typeof(T);
+
+            if (!_subscribers.ContainsKey(type))
+            {
+                Debug.Log($"Publish<{type.Name}> (no listeners)");
+                return;
+            }
+
+            Log($"Publish<{type.Name}> (listeners={_subscribers[type].Count})");
+
+            foreach (var subscriber in _subscribers[type])
+            {
+                ((Action<T>)subscriber).Invoke(eventData);
+            }
+        }
+
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        private static void Log(string msg)
+        {
+            Debug.Log($"[EventBus] {msg}");
+        }
     }
 }
