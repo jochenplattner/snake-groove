@@ -22,7 +22,7 @@
 ## Среда и инструменты
 
 - **Windows 11 Pro** (основная рабочая ОС)
-- **Unity Hub + Unity 6.2 (6000.2.4f1)** с установленными модулями:
+- **Unity Hub + Unity 6.2 (6000.3.7f1)** с установленными модулями:
   - Windows Build Support (IL2CPP)
   - WebGL Build Support
   - Android Build Support (SDK, NDK, OpenJDK)
