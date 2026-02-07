@@ -27,7 +27,7 @@
   - WebGL Build Support
   - Android Build Support (SDK, NDK, OpenJDK)
   - URP (Universal Render Pipeline)
-- **Visual Studio 2026 Community** + Unity plugin + GitHub Copilot *(новая версия вместо VS 2022)*
+- **Visual Studio 2026 Insiders** + Unity plugin + GitHub Copilot
 - **.NET 10 LTS SDK** *(новая версия)*
 - **Git 2.49.1**
 - **Git LFS 3.7.0** (установлены и проверены)

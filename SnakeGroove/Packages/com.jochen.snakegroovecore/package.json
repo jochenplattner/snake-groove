@@ -1,0 +1,10 @@
+{
+  "name": "com.jochen.snakegroovecore",
+  "displayName": "Snake Groove Core",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "description": "Чистое C# ядро игры Snake Groove. Не содержит Unity-зависимостей.",
+  "author": {
+    "name": "Jochen"
+  }
+}

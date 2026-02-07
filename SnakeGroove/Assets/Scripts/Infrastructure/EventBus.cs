@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-namespace SnakeGroove.Core
+namespace SnakeGroove.Infrastructure
 {
     public static class EventBus
     {
