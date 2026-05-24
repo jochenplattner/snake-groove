@@ -24,27 +24,28 @@ namespace SnakeGroove.Core
 
         /// <summary>
         /// Выполняет один тик игры.
+        /// Правила:
+        /// - вычислить nextHead;
+        /// - проверить выход за границы;
+        /// - определить, съест ли змейка еду на этом тике;
+        /// - вычислить allowTailPass (учитывая предстоящий рост);
+        /// - проверить self-collision через GameRules;
+        /// - если будет еда — вызвать Grow(1) ДО Move();
+        /// - выполнить Move();
+        /// - если была еда — увеличить Score и заспавнить новую еду.
         /// </summary>
-        /// <param name="inputDirection">Направление от игрока (null — без изменения направления).</param>
-        /// <returns>Результат тика.</returns>
         public TickResult Tick(Direction? inputDirection = null)
         {
-            // 1. Если игра окончена — сразу возвращаем GameOver
-            if (_state.IsGameOver)
-            {
-                return TickResult.GameOver;
-            }
+            // 1) Если игра уже окончена — сразу вернуть GameOver.
+            if (_state.IsGameOver) return TickResult.GameOver;
 
-            // 2. Обрабатываем ввод направления
-            if (inputDirection.HasValue)
-            {
-                _state.Snake.ChangeDirection(inputDirection.Value);
-            }
+            // 2) Применить ввод пользователя: изменить направление змейки, если задано.
+            if (inputDirection.HasValue) _state.Snake.ChangeDirection(inputDirection.Value);
 
-            // 3. Вычисляем следующую позицию головы
+            // 3) Вычислить следующую позицию головы (текущая голова + смещение по направлению).
             var nextHead = _state.Snake.Head + _state.Snake.CurrentDirection.ToOffset();
 
-            // 4. Проверяем выход за границы
+            // 4) Проверить выход за границы игрового поля — если да, установить GameOver с причиной HitWall.
             if (GameRules.IsOutsideBounds(nextHead, _state.GridSize))
             {
                 _state.IsGameOver = true;
@@ -52,9 +53,12 @@ namespace SnakeGroove.Core
                 return TickResult.GameOver;
             }
 
-            // 5. Проверяем столкновение с собой
-            // Если змейка НЕ растёт в этот тик, хвост освободится
-            bool allowTailPass = _state.Snake.PendingGrowth == 0;
+            // 5) Определить, будет ли съедена еда на этой позиции.
+            bool willEat = _state.Food != null && nextHead == _state.Food.Position;
+            // 6) Разрешить проход через хвост только если не будет еды и нет ожидаемого роста.
+            bool allowTailPass = !willEat && _state.Snake.PendingGrowth == 0;
+
+            // 7) Проверить самопересечение с учётом allowTailPass — в случае коллизии завершить игру.
             if (GameRules.IsSelfCollision(nextHead, _state.Snake.Segments, allowTailPass))
             {
                 _state.IsGameOver = true;
@@ -62,22 +66,22 @@ namespace SnakeGroove.Core
                 return TickResult.GameOver;
             }
 
-            // 6. Выполняем движение
+            // 8) Если будет еда — подготовить рост змейки (Grow) ДО перемещения, чтобы голова заняла клетку с едой.
+            if (willEat) _state.Snake.Grow(1);
+
+            // 9) Выполнить само перемещение (переместить голову, возможно убрать хвост).
             _state.Snake.Move();
 
-            // 7. Проверяем, съела ли змейка еду
-            if (_state.Food.Position == _state.Snake.Head)
+            // 10) Если еда была съедена — увеличить счёт, заспавнить новую еду и вернуть AteFood.
+            if (willEat)
             {
-                _state.Snake.Grow(1);
+                _state.Score++;
                 _state.Food = _spawner.Spawn(_state.Snake.Segments);
                 return TickResult.AteFood;
             }
 
+            // 11) В остальных случаях продолжать игру.
             return TickResult.Continue;
         }
-
-        // TODO: добавить подсчёт очков при поедании еды
-        // TODO: добавить изменение скорости тика в зависимости от типа еды
-        // TODO: добавить события для UI-слоя (OnFoodEaten, OnGameOver)
     }
 }

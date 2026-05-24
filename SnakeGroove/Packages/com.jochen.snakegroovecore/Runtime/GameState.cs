@@ -33,12 +33,13 @@ namespace SnakeGroove.Core
         public GameOverReason GameOverReason { get; set; }
 
         /// <summary>
+        /// Счёт игрока.
+        /// </summary>
+        public int Score { get; set; }
+
+        /// <summary>
         /// Создаёт состояние игры с заданными параметрами.
         /// </summary>
-        /// <param name="gridSize">Размер игровой сетки.</param>
-        /// <param name="snake">Змейка.</param>
-        /// <param name="initialFood">Начальная еда на поле.</param>
-        /// <exception cref="ArgumentNullException">Если змейка или еда не заданы.</exception>
         public GameState(GridSize gridSize, Snake snake, Food initialFood)
         {
             GridSize = gridSize;
@@ -46,10 +47,9 @@ namespace SnakeGroove.Core
             Food = initialFood ?? throw new ArgumentNullException(nameof(initialFood));
             IsGameOver = false;
             GameOverReason = GameOverReason.None;
+            Score = 0;
         }
 
         // TODO: добавить GameConfig (скорость тика, стартовая длина, seed для Random)
-        // TODO: добавить подсчёт очков (Score)
-        // TODO: добавить события/нотификации для UI-слоя (без EventBus в core)
     }
 }
