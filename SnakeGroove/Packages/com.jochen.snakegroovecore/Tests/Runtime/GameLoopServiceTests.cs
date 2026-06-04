@@ -1,4 +1,5 @@
 using System;
+
 using NUnit.Framework;
 
 namespace SnakeGroove.Core.Tests
@@ -36,7 +37,7 @@ namespace SnakeGroove.Core.Tests
             var state = new GameState(grid, snake, new Apple(new GridPosition(4, 4)));
             var loop = new GameLoopService(state, new FoodSpawner(grid, new Random(0)));
 
-            var result = loop.Tick(Direction.Left);
+            var result = loop.Tick(Direction.Up);
 
             Assert.AreEqual(TickResult.Continue, result.Outcome);
             Assert.AreEqual(Direction.Right, result.Snapshot.CurrentDirection);
