@@ -1,17 +1,20 @@
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Результат выполнения одного тика игры.
+    /// High-level outcome of one game tick.
     /// </summary>
     public enum TickResult
     {
-        /// <summary>Игра продолжается без особых событий.</summary>
+        /// <summary>The game continues without a special event.</summary>
         Continue,
 
-        /// <summary>Змейка съела еду.</summary>
+        /// <summary>The snake ate food on this tick.</summary>
         AteFood,
 
-        /// <summary>Игра окончена.</summary>
-        GameOver
+        /// <summary>The snake lost on this tick.</summary>
+        GameOver,
+
+        /// <summary>The board is filled and the level is complete.</summary>
+        LevelComplete
     }
 }

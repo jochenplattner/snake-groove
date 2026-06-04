@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Snake Groove UML - Unity to Core Sequence Diagram</title>
+  <style>
+    :root {
+      --bg: #10141b;
+      --panel: #151b25;
+      --text: #f5f7fb;
+      --muted: #aeb8c8;
+      --line: #a7b7cf;
+      --green: #74d680;
+      --blue: #80b7ff;
+      --yellow: #f0c866;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Segoe UI, Inter, system-ui, sans-serif; }
+    main { width: min(1240px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 48px; }
+    .topbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+    a { color: var(--text); text-decoration: none; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; padding: 9px 12px; background: rgba(255,255,255,.06); }
+    h1 { margin: 0; font-size: clamp(30px, 5vw, 52px); letter-spacing: 0; }
+    .subtitle { color: var(--muted); max-width: 920px; line-height: 1.55; }
+    .diagram { overflow-x: auto; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; background: var(--panel); padding: 12px; }
+    svg { display: block; min-width: 1180px; width: 100%; height: auto; }
+    .actor { fill: #202938; stroke: var(--line); stroke-width: 1.4; rx: 8; }
+    .unity { stroke: var(--blue); }
+    .core { stroke: var(--green); }
+    .result { stroke: var(--yellow); }
+    .life { stroke: rgba(255,255,255,.25); stroke-dasharray: 8 8; }
+    .activation { fill: rgba(255,255,255,.08); stroke: rgba(255,255,255,.24); }
+    .msg { fill: none; stroke: var(--line); stroke-width: 1.6; marker-end: url(#arrow); }
+    .return { fill: none; stroke: var(--green); stroke-width: 1.6; stroke-dasharray: 6 6; marker-end: url(#greenArrow); }
+    .label-main { fill: var(--text); font: 700 16px Segoe UI, sans-serif; text-anchor: middle; }
+    .label-sub { fill: var(--muted); font: 12px Segoe UI, sans-serif; text-anchor: middle; }
+    .text { fill: #d8e1ef; font: 14px Consolas, monospace; }
+    .small { fill: var(--muted); font: 13px Segoe UI, sans-serif; }
+    .note-box { fill: rgba(240,200,102,.08); stroke: rgba(240,200,102,.5); rx: 8; }
+    .note-text { fill: var(--yellow); font: 700 14px Segoe UI, sans-serif; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="topbar">
+      <a href="./index.html">Back to UML index</a>
+      <a href="./core-package-class-diagram.html">Core class diagram</a>
+    </div>
+
+    <h1>Unity-to-Core Sequence Diagram</h1>
+    <p class="subtitle">
+      Актуальный поток Phase 1: `SnakeRunner` не собирает mutable `GameState` вручную.
+      Он создаёт `GameSession`, вызывает `Tick(direction?)`, получает `GameTickResult`
+      и передаёт `Snapshot` визуальному слою.
+    </p>
+
+    <section class="diagram" aria-label="Unity to Core sequence diagram">
+      <svg viewBox="0 0 1240 900" role="img" aria-labelledby="diagramTitle diagramDesc">
+        <title id="diagramTitle">Unity to Core Sequence Diagram</title>
+        <desc id="diagramDesc">Sequence diagram showing SnakeRunner bridge, GameSession facade and pure core tick result.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+            <path d="M2,2 L10,6 L2,10 Z" fill="#a7b7cf"/>
+          </marker>
+          <marker id="greenArrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+            <path d="M2,2 L10,6 L2,10 Z" fill="#74d680"/>
+          </marker>
+        </defs>
+
+        <g transform="translate(35 30)">
+          <rect class="actor unity" width="170" height="70"/>
+          <text class="label-main" x="85" y="31">Unity Input</text>
+          <text class="label-sub" x="85" y="53">WASD / arrows</text>
+        </g>
+        <g transform="translate(250 30)">
+          <rect class="actor unity" width="180" height="70"/>
+          <text class="label-main" x="90" y="31">SnakeRunner</text>
+          <text class="label-sub" x="90" y="53">MonoBehaviour bridge</text>
+        </g>
+        <g transform="translate(485 30)">
+          <rect class="actor core" width="210" height="70"/>
+          <text class="label-main" x="105" y="31">GameSessionFactory</text>
+          <text class="label-sub" x="105" y="53">creates session</text>
+        </g>
+        <g transform="translate(750 30)">
+          <rect class="actor core" width="175" height="70"/>
+          <text class="label-main" x="87.5" y="31">GameSession</text>
+          <text class="label-sub" x="87.5" y="53">facade</text>
+        </g>
+        <g transform="translate(985 30)">
+          <rect class="actor result" width="190" height="70"/>
+          <text class="label-main" x="95" y="31">GameTickResult</text>
+          <text class="label-sub" x="95" y="53">Snapshot + outcome</text>
+        </g>
+
+        <line class="life" x1="120" y1="110" x2="120" y2="835"/>
+        <line class="life" x1="340" y1="110" x2="340" y2="835"/>
+        <line class="life" x1="590" y1="110" x2="590" y2="835"/>
+        <line class="life" x1="837" y1="110" x2="837" y2="835"/>
+        <line class="life" x1="1080" y1="110" x2="1080" y2="835"/>
+
+        <rect class="activation" x="332" y="150" width="16" height="650"/>
+        <rect class="activation" x="582" y="185" width="16" height="100"/>
+        <rect class="activation" x="829" y="320" width="16" height="300"/>
+        <rect class="activation" x="1072" y="620" width="16" height="85"/>
+
+        <path class="msg" d="M348 185 L582 185"/>
+        <text class="text" x="390" y="170">CreateClassicDefault(seed?)</text>
+
+        <path class="return" d="M582 285 L348 285"/>
+        <text class="small" x="430" y="270">GameSession</text>
+
+        <path class="msg" d="M120 345 L332 345"/>
+        <text class="text" x="168" y="330">read input direction</text>
+
+        <path class="msg" d="M348 420 L829 420"/>
+        <text class="text" x="500" y="405">session.Tick(direction?)</text>
+
+        <path class="msg" d="M845 485 C930 485 930 540 845 540"/>
+        <text class="text" x="870" y="512">core: rules, move, food, score</text>
+
+        <path class="return" d="M829 620 L348 620"/>
+        <text class="small" x="505" y="604">GameTickResult</text>
+
+        <path class="msg" d="M348 675 L1072 675"/>
+        <text class="text" x="565" y="660">render result.Snapshot</text>
+
+        <path class="return" d="M1072 705 L348 705"/>
+        <text class="small" x="600" y="730">Debug.Log / SnakeView / FoodView</text>
+
+        <rect class="note-box" x="425" y="770" width="500" height="70"/>
+        <text class="note-text" x="445" y="798">Branch on result.Outcome:</text>
+        <text class="small" x="445" y="823">Continue, AteFood, GameOver, LevelComplete</text>
+      </svg>
+    </section>
+  </main>
+</body>
+</html>

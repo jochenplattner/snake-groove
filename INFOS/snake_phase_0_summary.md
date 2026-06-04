@@ -143,7 +143,7 @@ snake-groove/
 
 - принимает ввод (WASD/стрелки)
 - обновляет ядро по таймеру (`ticksPerSecond`)
-- ловит исключение `SnakeGameOverException`
+- обрабатывает `GameTickResult.Outcome` (`GameOver` / `LevelComplete`)
 
 Подключить в сцене Game.
 
@@ -183,4 +183,3 @@ snake-groove/
 ---
 
 *End of snake\_phase\_0\_summary.md*
-

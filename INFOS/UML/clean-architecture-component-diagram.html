@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Snake Groove UML - Clean Architecture Component Diagram</title>
+  <style>
+    :root {
+      --bg: #10141b;
+      --panel: #151b25;
+      --text: #f5f7fb;
+      --muted: #aeb8c8;
+      --stroke: #94a6bf;
+      --green: #74d680;
+      --blue: #80b7ff;
+      --yellow: #f0c866;
+      --pink: #ef8297;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Segoe UI, Inter, system-ui, sans-serif; }
+    main { width: min(1240px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 48px; }
+    .topbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+    a { color: var(--text); text-decoration: none; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; padding: 9px 12px; background: rgba(255,255,255,.06); }
+    h1 { margin: 0; font-size: clamp(30px, 5vw, 52px); letter-spacing: 0; }
+    .subtitle { color: var(--muted); max-width: 920px; line-height: 1.55; }
+    .diagram { overflow-x: auto; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; background: var(--panel); padding: 12px; }
+    svg { display: block; min-width: 1200px; width: 100%; height: auto; }
+    .layer { fill: rgba(255,255,255,.035); stroke: rgba(255,255,255,.16); stroke-width: 1.2; rx: 8; }
+    .component { fill: #202938; stroke: var(--stroke); stroke-width: 1.4; rx: 8; }
+    .presentation { stroke: var(--blue); }
+    .adapter { stroke: var(--yellow); }
+    .domain { stroke: var(--green); }
+    .tests { stroke: var(--pink); }
+    .dep { fill: none; stroke: var(--stroke); stroke-width: 1.5; marker-end: url(#arrow); }
+    .dep-green { fill: none; stroke: var(--green); stroke-width: 1.7; marker-end: url(#greenArrow); }
+    .layer-title { fill: var(--text); font: 800 22px Segoe UI, sans-serif; }
+    .title { fill: var(--text); font: 700 16px Segoe UI, sans-serif; }
+    .path { fill: var(--muted); font: 13px Consolas, monospace; }
+    .label { fill: #d8e1ef; font: 13px Segoe UI, sans-serif; }
+    .small { fill: var(--muted); font: 13px Segoe UI, sans-serif; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="topbar">
+      <a href="./index.html">Back to UML index</a>
+      <a href="./core-package-class-diagram.html">Core class diagram</a>
+    </div>
+
+    <h1>Clean Architecture Component Diagram</h1>
+    <p class="subtitle">
+      Текущая компонентная карта: Presentation и Unity Adapter зависят от Domain Core,
+      но Domain Core остаётся pure C# package без `UnityEngine`.
+    </p>
+
+    <section class="diagram" aria-label="Clean Architecture component diagram">
+      <svg viewBox="0 0 1240 860" role="img" aria-labelledby="diagramTitle diagramDesc">
+        <title id="diagramTitle">Clean Architecture Component Diagram</title>
+        <desc id="diagramDesc">Component diagram showing current Snake Groove clean architecture layers.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+            <path d="M2,2 L10,6 L2,10 Z" fill="#94a6bf"/>
+          </marker>
+          <marker id="greenArrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+            <path d="M2,2 L10,6 L2,10 Z" fill="#74d680"/>
+          </marker>
+        </defs>
+
+        <rect class="layer" x="70" y="50" width="1100" height="165"/>
+        <text class="layer-title" x="100" y="92">Presentation Layer</text>
+
+        <rect class="component presentation" x="105" y="120" width="250" height="70"/>
+        <text class="title" x="125" y="148">UI Screens</text>
+        <text class="path" x="125" y="173">MainMenu / Settings / HUD</text>
+
+        <rect class="component presentation" x="405" y="120" width="250" height="70"/>
+        <text class="title" x="425" y="148">Gameplay View</text>
+        <text class="path" x="425" y="173">SnakeView / FoodView</text>
+
+        <rect class="component presentation" x="705" y="120" width="250" height="70"/>
+        <text class="title" x="725" y="148">Audio Layer</text>
+        <text class="path" x="725" y="173">future Music Layers</text>
+
+        <rect class="layer" x="70" y="275" width="1100" height="190"/>
+        <text class="layer-title" x="100" y="317">Unity Adapter Layer</text>
+
+        <rect class="component adapter" x="105" y="350" width="250" height="80"/>
+        <text class="title" x="125" y="379">Scene Flow</text>
+        <text class="path" x="125" y="404">BootLoader, GameManager</text>
+
+        <rect class="component adapter" x="405" y="350" width="250" height="80"/>
+        <text class="title" x="425" y="379">SnakeRunner</text>
+        <text class="path" x="425" y="404">GameSession facade</text>
+
+        <rect class="component adapter" x="705" y="350" width="250" height="80"/>
+        <text class="title" x="725" y="379">EventBus</text>
+        <text class="path" x="725" y="404">Unity-level events</text>
+
+        <rect class="layer" x="70" y="530" width="1100" height="200"/>
+        <text class="layer-title" x="100" y="572">Domain Core Package</text>
+
+        <rect class="component domain" x="105" y="605" width="250" height="85"/>
+        <text class="title" x="125" y="634">Session API</text>
+        <text class="path" x="125" y="659">GameSessionFactory</text>
+        <text class="path" x="125" y="681">GameSession, GameConfig</text>
+
+        <rect class="component domain" x="405" y="605" width="250" height="85"/>
+        <text class="title" x="425" y="634">Domain State</text>
+        <text class="path" x="425" y="659">GameState, Snake, Food</text>
+        <text class="path" x="425" y="681">GameSnapshot</text>
+
+        <rect class="component domain" x="705" y="605" width="250" height="85"/>
+        <text class="title" x="725" y="634">Tick Logic</text>
+        <text class="path" x="725" y="659">GameLoopService</text>
+        <text class="path" x="725" y="681">GameTickResult, Rules</text>
+
+        <rect class="component tests" x="995" y="605" width="130" height="85"/>
+        <text class="title" x="1015" y="634">Tests</text>
+        <text class="path" x="1015" y="659">NUnit</text>
+        <text class="path" x="1015" y="681">package</text>
+
+        <path class="dep" d="M530 190 L530 350"/>
+        <text class="label" x="548" y="270">render snapshot</text>
+
+        <path class="dep" d="M830 350 L830 190"/>
+        <text class="label" x="848" y="270">future audio events</text>
+
+        <path class="dep-green" d="M530 430 L230 605"/>
+        <text class="label" x="315" y="515">creates session</text>
+
+        <path class="dep-green" d="M530 430 L530 605"/>
+        <text class="label" x="548" y="515">reads snapshot</text>
+
+        <path class="dep-green" d="M530 430 L830 605"/>
+        <text class="label" x="662" y="515">Tick(direction?)</text>
+
+        <path class="dep-green" d="M830 690 L655 650"/>
+        <text class="label" x="685" y="720">mutates internally</text>
+
+        <path class="dep" d="M995 650 L955 650"/>
+        <text class="label" x="962" y="635">verifies</text>
+
+        <path class="dep" d="M230 350 L230 190"/>
+        <text class="label" x="248" y="270">scene events</text>
+
+        <text class="small" x="100" y="785">Rule: dependencies point inward. Domain Core can be compiled and tested without UnityEngine references.</text>
+        <text class="small" x="100" y="815">Unity Adapter controls timing/input/presentation; Domain Core owns rules, state transitions and tick results.</text>
+      </svg>
+    </section>
+  </main>
+</body>
+</html>

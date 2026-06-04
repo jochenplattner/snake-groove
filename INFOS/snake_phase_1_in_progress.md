@@ -63,8 +63,14 @@ Packages/
       Food.cs
       FoodSpawner.cs
       GameRules.cs
+      GameConfig.cs
+      GameSession.cs
+      GameSessionFactory.cs
+      GameSnapshot.cs
+      GameStatus.cs
       GameState.cs
       GameLoopService.cs
+      GameTickResult.cs
       GameOverReason.cs
       TickResult.cs
 ```
@@ -156,11 +162,30 @@ Canvas_MainMenu
   - запрещает разворот на 180 градусов через `ChangeDirection()`.
 
 - `Food`
-  - хранит позицию еды на поле.
+  - хранит позицию еды на поле;
+  - содержит `ScoreValue` и `GrowthAmount`.
 
 - `FoodSpawner`
   - создаёт новую еду;
-  - учитывает занятые змейкой клетки.
+  - учитывает занятые змейкой клетки;
+  - поддерживает `TrySpawn(...)`, чтобы заполненное поле стало `LevelComplete`, а не техническим исключением.
+
+- `GameConfig`
+  - хранит размер поля, стартовые сегменты змейки, направление, скорость тика и optional seed;
+  - валидирует стартовую конфигурацию.
+
+- `GameSessionFactory`
+  - создаёт полностью связанную игровую сессию;
+  - скрывает ручную сборку `Snake`, `FoodSpawner`, `GameState`, `GameLoopService`.
+
+- `GameSession`
+  - публичный facade для Unity-адаптера;
+  - отдаёт `Snapshot`;
+  - выполняет `Tick(Direction?)`.
+
+- `GameSnapshot`
+  - read-only снимок состояния для UI, View и Debug.Log;
+  - защищает ядро от случайной мутации Unity-слоем.
 
 - `GameRules`
   - проверка выхода за границы;
@@ -172,8 +197,9 @@ Canvas_MainMenu
   - хранит `Snake`;
   - хранит текущую `Food`;
   - хранит `Score`;
-  - хранит `IsGameOver`;
-  - хранит `GameOverReason`.
+  - хранит `Status`;
+  - хранит `GameOverReason`;
+  - публичных setters нет: состояние меняется только методами ядра.
 
 - `GameLoopService`
   - выполняет один игровой тик через `Tick(Direction? inputDirection = null)`;
@@ -182,10 +208,10 @@ Canvas_MainMenu
   - проверяет выход за границы;
   - определяет, будет ли съедена еда;
   - проверяет self-collision;
-  - вызывает `Grow(1)` перед `Move()`, если змейка съедает еду;
-  - увеличивает `Score`;
-  - спаунит новую еду;
-  - возвращает `TickResult`.
+  - применяет `GrowthAmount` и `ScoreValue` съеденной еды;
+  - спаунит новую еду через `TrySpawn(...)`;
+  - завершает уровень как `LevelComplete`, если свободных клеток не осталось;
+  - возвращает `GameTickResult`.
 
 - `GameOverReason`
   - `None`;
@@ -195,11 +221,16 @@ Canvas_MainMenu
 - `TickResult`
   - `Continue`;
   - `AteFood`;
-  - `GameOver`.
+  - `GameOver`;
+  - `LevelComplete`.
+
+- `GameTickResult`
+  - содержит `Outcome`, `ScoreDelta`, `EatenFood`, `SpawnedFood`, `GameOverReason`, `Snapshot`;
+  - является основным ответом ядра на один тик.
 
 **Ключевое архитектурное решение:**
 - ядро остаётся полностью независимым от Unity;
-- Unity-слой в дальнейшем будет только передавать ввод, вызывать `Tick()` и отображать состояние.
+- Unity-слой в дальнейшем будет только создавать `GameSession`, передавать ввод, вызывать `Tick()` и отображать `GameSnapshot`.
 
 **Коммит:** `Phase1-3: Snake Core`
 
@@ -215,9 +246,10 @@ Canvas_MainMenu
 
 Цель:
 - создать Unity-адаптер, который будет принимать ввод игрока;
-- вызывать `GameLoopService.Tick()`;
-- передавать состояние ядра дальше в визуальный слой;
-- обрабатывать `TickResult.GameOver`.
+- создать `GameSession` через `GameSessionFactory.CreateClassicDefault(...)`;
+- вызывать `GameSession.Tick(direction?)`;
+- передавать `GameTickResult.Snapshot` дальше в визуальный слой;
+- обрабатывать `TickResult.GameOver` и `TickResult.LevelComplete`.
 
 Минимальный план:
 - создать `SnakeRunner.cs` в `Assets/Scripts/Gameplay`;
@@ -313,9 +345,9 @@ Canvas_MainMenu
 - Расширить UIScreen анимациями (fade / slide)
 - Раннее подключение аудио-слоя (`AudioLayerManager`)
 - Покрыть Snake Core тестами до усложнения логики
-- Добавить `GameConfig` для скорости тика, размера поля и стартовых параметров
-- Добавить seed-based random для воспроизводимых тестов
-- Подумать над отдельным `TickResult`/event-механизмом для UI и Audio слоя
+- Расширить package tests новыми сценариями для еды, self-collision и seed-based random
+- Добавить CI-запуск Unity Test Runner / package tests
+- Подумать над event-механизмом поверх `GameTickResult` для UI и Audio слоя
 - В будущем вынести разные типы еды и эффектов через Strategy / Factory
 
 ---
@@ -327,7 +359,8 @@ Canvas_MainMenu
 - Unity bridge / SnakeRunner: 🔄 следующий активный шаг
 - Интеграция с Game-сценой: ⏳ впереди
 - Визуализация: ⏳ впереди
-- Unit-тесты и CI: ⏳ впереди
+- Unit-тесты ядра: ✅ package test assembly создана
+- CI: ⏳ впереди
 - Phase 1 summary: ⏳ впереди
 
 📌 Этот файл является **центральной точкой отсчёта Фазы 1** и используется как база для всех дальнейших чатов и решений.
@@ -342,6 +375,6 @@ Canvas_MainMenu
 
 Цель ближайшей итерации:
 
-> **Start → Game.unity → SnakeRunner создаёт GameState → GameLoopService начинает тикать → состояние выводится в Debug.Log.**
+> **Start → Game.unity → SnakeRunner создаёт GameSession через GameSessionFactory → GameSession.Tick() возвращает GameTickResult → Snapshot выводится в Debug.Log / визуальный слой.**
 
 После этого проект перейдёт от “ядро готово” к “игра начала жить внутри Unity”.

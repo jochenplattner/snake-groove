@@ -1,55 +1,155 @@
 using System;
+using System.Collections.Generic;
 
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Хранит состояние игры. Содержит ТОЛЬКО данные, без логики тика.
+    /// Holds the mutable domain state of a running game.
     /// </summary>
     public sealed class GameState
     {
         /// <summary>
-        /// Размер игровой сетки.
+        /// Size of the game grid.
         /// </summary>
         public GridSize GridSize { get; }
 
         /// <summary>
-        /// Змейка в текущем состоянии игры.
+        /// Snake in the current game state.
         /// </summary>
         public Snake Snake { get; }
 
         /// <summary>
-        /// Текущая еда на поле.
+        /// Current food on the board. Null when the level is complete.
         /// </summary>
-        public Food Food { get; set; }
+        public Food Food { get; private set; }
 
         /// <summary>
-        /// Признак окончания игры.
+        /// Current lifecycle status.
         /// </summary>
-        public bool IsGameOver { get; set; }
+        public GameStatus Status { get; private set; }
 
         /// <summary>
-        /// Причина окончания игры.
+        /// True when the player lost.
         /// </summary>
-        public GameOverReason GameOverReason { get; set; }
+        public bool IsGameOver => Status == GameStatus.GameOver;
 
         /// <summary>
-        /// Счёт игрока.
+        /// True when the board is filled.
         /// </summary>
-        public int Score { get; set; }
+        public bool IsLevelComplete => Status == GameStatus.LevelComplete;
 
         /// <summary>
-        /// Создаёт состояние игры с заданными параметрами.
+        /// Reason for a GameOver status.
         /// </summary>
-        public GameState(GridSize gridSize, Snake snake, Food initialFood)
+        public GameOverReason GameOverReason { get; private set; }
+
+        /// <summary>
+        /// Player score.
+        /// </summary>
+        public int Score { get; private set; }
+
+        /// <summary>
+        /// Creates game state with validated starting data.
+        /// </summary>
+        public GameState(GridSize gridSize, Snake snake, Food initialFood, int initialScore = 0)
         {
+            if (initialScore < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(initialScore), initialScore, "Initial score must be >= 0");
+            }
+
+            if (initialFood == null)
+            {
+                throw new ArgumentNullException(nameof(initialFood));
+            }
+
             GridSize = gridSize;
             Snake = snake ?? throw new ArgumentNullException(nameof(snake));
-            Food = initialFood ?? throw new ArgumentNullException(nameof(initialFood));
-            IsGameOver = false;
+
+            if (GameRules.IsOutsideBounds(initialFood.Position, gridSize))
+            {
+                throw new ArgumentException("Initial food is outside the grid", nameof(initialFood));
+            }
+
+            var occupied = new HashSet<GridPosition>();
+            for (int i = 0; i < Snake.Segments.Count; i++)
+            {
+                var segment = Snake.Segments[i];
+                if (GameRules.IsOutsideBounds(segment, gridSize))
+                {
+                    throw new ArgumentException("Initial snake segment is outside the grid", nameof(snake));
+                }
+
+                if (!occupied.Add(segment))
+                {
+                    throw new ArgumentException("Initial snake segments must be unique", nameof(snake));
+                }
+
+                if (segment == initialFood.Position)
+                {
+                    throw new ArgumentException("Initial food cannot overlap the snake", nameof(initialFood));
+                }
+            }
+
+            Food = initialFood;
+            Score = initialScore;
+            Status = GameStatus.Running;
             GameOverReason = GameOverReason.None;
-            Score = 0;
         }
 
-        // TODO: добавить GameConfig (скорость тика, стартовая длина, seed для Random)
+        /// <summary>
+        /// Creates a read-only snapshot for adapters and UI.
+        /// </summary>
+        public GameSnapshot CreateSnapshot()
+        {
+            return new GameSnapshot(this);
+        }
+
+        internal void AddScore(int amount)
+        {
+            if (amount < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(amount), amount, "Score amount must be >= 0");
+            }
+
+            Score += amount;
+        }
+
+        internal void SetFood(Food food)
+        {
+            if (food == null)
+            {
+                throw new ArgumentNullException(nameof(food));
+            }
+
+            if (GameRules.IsOutsideBounds(food.Position, GridSize))
+            {
+                throw new ArgumentException("Food is outside the grid", nameof(food));
+            }
+
+            Food = food;
+        }
+
+        internal void ClearFood()
+        {
+            Food = null;
+        }
+
+        internal void MarkGameOver(GameOverReason reason)
+        {
+            if (reason == GameOverReason.None)
+            {
+                throw new ArgumentException("Game over requires a concrete reason", nameof(reason));
+            }
+
+            Status = GameStatus.GameOver;
+            GameOverReason = reason;
+        }
+
+        internal void CompleteLevel()
+        {
+            Status = GameStatus.LevelComplete;
+            GameOverReason = GameOverReason.None;
+        }
     }
 }

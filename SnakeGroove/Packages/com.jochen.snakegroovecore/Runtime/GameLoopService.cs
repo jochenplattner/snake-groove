@@ -3,7 +3,7 @@ using System;
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Сервис игрового цикла. Содержит логику одного тика игры.
+    /// Applies one domain tick to a game state.
     /// </summary>
     public sealed class GameLoopService
     {
@@ -11,11 +11,8 @@ namespace SnakeGroove.Core
         private readonly FoodSpawner _spawner;
 
         /// <summary>
-        /// Создаёт сервис игрового цикла.
+        /// Creates a game loop service.
         /// </summary>
-        /// <param name="state">Состояние игры.</param>
-        /// <param name="spawner">Спавнер еды.</param>
-        /// <exception cref="ArgumentNullException">Если state или spawner не заданы.</exception>
         public GameLoopService(GameState state, FoodSpawner spawner)
         {
             _state = state ?? throw new ArgumentNullException(nameof(state));
@@ -23,65 +20,71 @@ namespace SnakeGroove.Core
         }
 
         /// <summary>
-        /// Выполняет один тик игры.
-        /// Правила:
-        /// - вычислить nextHead;
-        /// - проверить выход за границы;
-        /// - определить, съест ли змейка еду на этом тике;
-        /// - вычислить allowTailPass (учитывая предстоящий рост);
-        /// - проверить self-collision через GameRules;
-        /// - если будет еда — вызвать Grow(1) ДО Move();
-        /// - выполнить Move();
-        /// - если была еда — увеличить Score и заспавнить новую еду.
+        /// Advances the game by one tick.
         /// </summary>
-        public TickResult Tick(Direction? inputDirection = null)
+        public GameTickResult Tick(Direction? inputDirection = null)
         {
-            // 1) Если игра уже окончена — сразу вернуть GameOver.
-            if (_state.IsGameOver) return TickResult.GameOver;
+            if (_state.IsGameOver)
+            {
+                return GameTickResult.GameOver(_state.GameOverReason, _state.CreateSnapshot());
+            }
 
-            // 2) Применить ввод пользователя: изменить направление змейки, если задано.
-            if (inputDirection.HasValue) _state.Snake.ChangeDirection(inputDirection.Value);
+            if (_state.IsLevelComplete)
+            {
+                return GameTickResult.LevelComplete(null, 0, _state.CreateSnapshot());
+            }
 
-            // 3) Вычислить следующую позицию головы (текущая голова + смещение по направлению).
+            if (inputDirection.HasValue)
+            {
+                _state.Snake.ChangeDirection(inputDirection.Value);
+            }
+
             var nextHead = _state.Snake.Head + _state.Snake.CurrentDirection.ToOffset();
-
-            // 4) Проверить выход за границы игрового поля — если да, установить GameOver с причиной HitWall.
             if (GameRules.IsOutsideBounds(nextHead, _state.GridSize))
             {
-                _state.IsGameOver = true;
-                _state.GameOverReason = GameOverReason.HitWall;
-                return TickResult.GameOver;
+                _state.MarkGameOver(GameOverReason.HitWall);
+                return GameTickResult.GameOver(_state.GameOverReason, _state.CreateSnapshot());
             }
 
-            // 5) Определить, будет ли съедена еда на этой позиции.
             bool willEat = _state.Food != null && nextHead == _state.Food.Position;
-            // 6) Разрешить проход через хвост только если не будет еды и нет ожидаемого роста.
-            bool allowTailPass = !willEat && _state.Snake.PendingGrowth == 0;
+            int growthAmount = willEat ? _state.Food.GrowthAmount : 0;
+            bool allowTailPass = growthAmount == 0 && _state.Snake.PendingGrowth == 0;
 
-            // 7) Проверить самопересечение с учётом allowTailPass — в случае коллизии завершить игру.
             if (GameRules.IsSelfCollision(nextHead, _state.Snake.Segments, allowTailPass))
             {
-                _state.IsGameOver = true;
-                _state.GameOverReason = GameOverReason.HitSelf;
-                return TickResult.GameOver;
+                _state.MarkGameOver(GameOverReason.HitSelf);
+                return GameTickResult.GameOver(_state.GameOverReason, _state.CreateSnapshot());
             }
 
-            // 8) Если будет еда — подготовить рост змейки (Grow) ДО перемещения, чтобы голова заняла клетку с едой.
-            if (willEat) _state.Snake.Grow(1);
-
-            // 9) Выполнить само перемещение (переместить голову, возможно убрать хвост).
-            _state.Snake.Move();
-
-            // 10) Если еда была съедена — увеличить счёт, заспавнить новую еду и вернуть AteFood.
+            Food eatenFood = null;
             if (willEat)
             {
-                _state.Score++;
-                _state.Food = _spawner.Spawn(_state.Snake.Segments);
-                return TickResult.AteFood;
+                eatenFood = _state.Food;
+                if (growthAmount > 0)
+                {
+                    _state.Snake.Grow(growthAmount);
+                }
             }
 
-            // 11) В остальных случаях продолжать игру.
-            return TickResult.Continue;
+            _state.Snake.Move();
+
+            if (!willEat)
+            {
+                return GameTickResult.Continue(_state.CreateSnapshot());
+            }
+
+            int scoreDelta = eatenFood.ScoreValue;
+            _state.AddScore(scoreDelta);
+
+            if (_spawner.TrySpawn(_state.Snake.Segments, out var spawnedFood))
+            {
+                _state.SetFood(spawnedFood);
+                return GameTickResult.AteFood(eatenFood, spawnedFood, scoreDelta, _state.CreateSnapshot());
+            }
+
+            _state.ClearFood();
+            _state.CompleteLevel();
+            return GameTickResult.LevelComplete(eatenFood, scoreDelta, _state.CreateSnapshot());
         }
     }
 }

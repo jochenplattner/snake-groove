@@ -1,17 +1,17 @@
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Причина окончания игры.
+    /// Reason why the player lost.
     /// </summary>
     public enum GameOverReason
     {
-        /// <summary>Игра не окончена.</summary>
+        /// <summary>The game is not over.</summary>
         None,
 
-        /// <summary>Змейка врезалась в стену (вышла за границы поля).</summary>
+        /// <summary>The snake moved outside the board.</summary>
         HitWall,
 
-        /// <summary>Змейка врезалась сама в себя.</summary>
+        /// <summary>The snake collided with itself.</summary>
         HitSelf
     }
 }

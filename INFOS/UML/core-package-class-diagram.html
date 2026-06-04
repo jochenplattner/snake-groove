@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Snake Groove UML - Core Package Class Diagram</title>
+  <style>
+    :root {
+      --bg: #10141b;
+      --panel: #1b2230;
+      --text: #f5f7fb;
+      --muted: #aeb8c8;
+      --line: #94a6bf;
+      --green: #74d680;
+      --blue: #80b7ff;
+      --yellow: #f0c866;
+      --pink: #ef8297;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Segoe UI, Inter, system-ui, sans-serif; }
+    main { width: min(1240px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 48px; }
+    .topbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+    a { color: var(--text); text-decoration: none; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; padding: 9px 12px; background: rgba(255,255,255,.06); }
+    h1 { margin: 0; font-size: clamp(30px, 5vw, 52px); letter-spacing: 0; }
+    .subtitle { color: var(--muted); max-width: 900px; line-height: 1.55; }
+    .diagram { overflow-x: auto; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; background: #151b25; padding: 12px; }
+    svg { display: block; min-width: 1180px; width: 100%; height: auto; }
+    .box { fill: #202938; stroke: var(--line); stroke-width: 1.4; rx: 8; }
+    .session { stroke: var(--green); }
+    .service { stroke: var(--blue); }
+    .result { stroke: var(--yellow); }
+    .state { stroke: var(--pink); }
+    .value { stroke: #c0d0e6; }
+    .header { fill: rgba(255,255,255,.08); }
+    .title { fill: var(--text); font: 700 17px Segoe UI, sans-serif; }
+    .member { fill: #d8e1ef; font: 14px Consolas, monospace; }
+    .small { fill: var(--muted); font: 13px Segoe UI, sans-serif; }
+    .relation { fill: none; stroke: var(--line); stroke-width: 1.5; marker-end: url(#arrow); }
+    .strong { stroke: var(--green); marker-end: url(#greenArrow); }
+    .label { fill: var(--muted); font: 13px Segoe UI, sans-serif; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="topbar">
+      <a href="./index.html">Back to UML index</a>
+      <a href="../SNAKE_ARCHITECTURE.md">Architecture document</a>
+    </div>
+
+    <h1>Core Package Class Diagram</h1>
+    <p class="subtitle">
+      Текущая схема embedded package `com.jochen.snakegroovecore`: Unity работает через `GameSession`,
+      получает `GameTickResult` и `GameSnapshot`, а mutable `GameState` меняется только внутри ядра.
+    </p>
+
+    <section class="diagram" aria-label="Core package class diagram">
+      <svg viewBox="0 0 1240 980" role="img" aria-labelledby="diagramTitle diagramDesc">
+        <title id="diagramTitle">Core Package Class Diagram</title>
+        <desc id="diagramDesc">UML class diagram for the current Snake Groove pure C# core package.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+            <path d="M2,2 L10,6 L2,10 Z" fill="#94a6bf"/>
+          </marker>
+          <marker id="greenArrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+            <path d="M2,2 L10,6 L2,10 Z" fill="#74d680"/>
+          </marker>
+        </defs>
+
+        <g transform="translate(40 40)">
+          <rect class="box session" width="270" height="134"/>
+          <rect class="header" width="270" height="38" rx="8"/>
+          <text class="title" x="16" y="25">GameSessionFactory</text>
+          <text class="member" x="16" y="64">+ Create(GameConfig)</text>
+          <text class="member" x="16" y="88">+ CreateClassicDefault(seed?)</text>
+          <text class="small" x="16" y="116">wires state + services</text>
+        </g>
+
+        <g transform="translate(360 40)">
+          <rect class="box value" width="270" height="160"/>
+          <rect class="header" width="270" height="38" rx="8"/>
+          <text class="title" x="16" y="25">GameConfig</text>
+          <text class="member" x="16" y="64">+ GridSize</text>
+          <text class="member" x="16" y="88">+ InitialSnakeSegments</text>
+          <text class="member" x="16" y="112">+ TicksPerSecond</text>
+          <text class="member" x="16" y="136">+ RandomSeed?</text>
+        </g>
+
+        <g transform="translate(700 40)">
+          <rect class="box session" width="270" height="150"/>
+          <rect class="header" width="270" height="38" rx="8"/>
+          <text class="title" x="16" y="25">GameSession</text>
+          <text class="member" x="16" y="64">+ Config</text>
+          <text class="member" x="16" y="88">+ Snapshot</text>
+          <text class="member" x="16" y="112">+ Tick(Direction?) GameTickResult</text>
+          <text class="small" x="16" y="136">public core facade</text>
+        </g>
+
+        <g transform="translate(40 270)">
+          <rect class="box service" width="300" height="150"/>
+          <rect class="header" width="300" height="38" rx="8"/>
+          <text class="title" x="16" y="25">GameLoopService</text>
+          <text class="member" x="16" y="64">- GameState _state</text>
+          <text class="member" x="16" y="88">- FoodSpawner _spawner</text>
+          <text class="member" x="16" y="112">+ Tick(Direction?) GameTickResult</text>
+          <text class="small" x="16" y="136">applies one domain tick</text>
+        </g>
+
+        <g transform="translate(420 250)">
+          <rect class="box state" width="330" height="210"/>
+          <rect class="header" width="330" height="38" rx="8"/>
+          <text class="title" x="16" y="25">GameState</text>
+          <text class="member" x="16" y="64">+ GridSize</text>
+          <text class="member" x="16" y="88">+ Snake</text>
+          <text class="member" x="16" y="112">+ Food private set</text>
+          <text class="member" x="16" y="136">+ Score private set</text>
+          <text class="member" x="16" y="160">+ Status private set</text>
+          <text class="member" x="16" y="184">+ CreateSnapshot()</text>
+        </g>
+
+        <g transform="translate(830 250)">
+          <rect class="box result" width="330" height="210"/>
+          <rect class="header" width="330" height="38" rx="8"/>
+          <text class="title" x="16" y="25">GameTickResult</text>
+          <text class="member" x="16" y="64">+ Outcome TickResult</text>
+          <text class="member" x="16" y="88">+ ScoreDelta</text>
+          <text class="member" x="16" y="112">+ EatenFood</text>
+          <text class="member" x="16" y="136">+ SpawnedFood</text>
+          <text class="member" x="16" y="160">+ GameOverReason</text>
+          <text class="member" x="16" y="184">+ Snapshot</text>
+        </g>
+
+        <g transform="translate(40 545)">
+          <rect class="box state" width="310" height="180"/>
+          <rect class="header" width="310" height="38" rx="8"/>
+          <text class="title" x="16" y="25">Snake</text>
+          <text class="member" x="16" y="64">+ Segments</text>
+          <text class="member" x="16" y="88">+ Head</text>
+          <text class="member" x="16" y="112">+ CurrentDirection</text>
+          <text class="member" x="16" y="136">+ Move()</text>
+          <text class="member" x="16" y="160">+ Grow(int)</text>
+        </g>
+
+        <g transform="translate(420 545)">
+          <rect class="box state" width="280" height="150"/>
+          <rect class="header" width="280" height="38" rx="8"/>
+          <text class="title" x="16" y="25">Food / Apple</text>
+          <text class="member" x="16" y="64">+ Position</text>
+          <text class="member" x="16" y="88">+ ScoreValue</text>
+          <text class="member" x="16" y="112">+ GrowthAmount</text>
+        </g>
+
+        <g transform="translate(760 545)">
+          <rect class="box service" width="270" height="150"/>
+          <rect class="header" width="270" height="38" rx="8"/>
+          <text class="title" x="16" y="25">FoodSpawner</text>
+          <text class="member" x="16" y="64">+ Spawn(...) Food</text>
+          <text class="member" x="16" y="88">+ TrySpawn(..., out Food)</text>
+          <text class="small" x="16" y="120">no free cells => false</text>
+        </g>
+
+        <g transform="translate(40 800)">
+          <rect class="box value" width="250" height="120"/>
+          <rect class="header" width="250" height="38" rx="8"/>
+          <text class="title" x="16" y="25">Value Objects</text>
+          <text class="member" x="16" y="64">GridPosition</text>
+          <text class="member" x="16" y="88">GridSize, Direction</text>
+        </g>
+
+        <g transform="translate(360 800)">
+          <rect class="box service" width="250" height="120"/>
+          <rect class="header" width="250" height="38" rx="8"/>
+          <text class="title" x="16" y="25">GameRules</text>
+          <text class="member" x="16" y="64">IsOutsideBounds(...)</text>
+          <text class="member" x="16" y="88">IsSelfCollision(...)</text>
+        </g>
+
+        <g transform="translate(680 800)">
+          <rect class="box result" width="260" height="120"/>
+          <rect class="header" width="260" height="38" rx="8"/>
+          <text class="title" x="16" y="25">Enums</text>
+          <text class="member" x="16" y="64">TickResult + LevelComplete</text>
+          <text class="member" x="16" y="88">GameStatus, GameOverReason</text>
+        </g>
+
+        <g transform="translate(1000 800)">
+          <rect class="box result" width="200" height="120"/>
+          <rect class="header" width="200" height="38" rx="8"/>
+          <text class="title" x="16" y="25">Tests</text>
+          <text class="member" x="16" y="64">SnakeGroove.Core.Tests</text>
+          <text class="small" x="16" y="92">package test assembly</text>
+        </g>
+
+        <path class="relation strong" d="M310 105 L360 105"/>
+        <path class="relation strong" d="M630 115 L700 115"/>
+        <path class="relation strong" d="M835 190 L280 270"/>
+        <path class="relation strong" d="M340 345 L420 345"/>
+        <path class="relation strong" d="M340 385 L830 345"/>
+        <path class="relation" d="M585 460 L585 545"/>
+        <path class="relation" d="M750 345 L830 345"/>
+        <path class="relation" d="M585 460 L195 545"/>
+        <path class="relation" d="M585 460 L560 545"/>
+        <path class="relation" d="M760 625 L700 625"/>
+        <path class="relation" d="M195 725 L165 800"/>
+        <path class="relation" d="M585 460 L485 800"/>
+        <path class="relation" d="M995 460 L820 800"/>
+
+        <text class="label" x="316" y="94">uses</text>
+        <text class="label" x="642" y="104">creates</text>
+        <text class="label" x="430" y="248">internal mutation only</text>
+        <text class="label" x="760" y="332">snapshot/result</text>
+      </svg>
+    </section>
+  </main>
+</body>
+</html>

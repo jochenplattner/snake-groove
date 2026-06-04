@@ -114,29 +114,33 @@
 
 ## 3.1 Core.GameLogic (Pure C#)
 
-- Domain Entities: Snake, Food, Level, AudioLayer, PowerUp, Terrain
-- Value Objects: GridPosition, Direction, Score, Velocity
-- Services: GameLoopService, CollisionDetectionService
-- Audio Domain: AudioLayerManager, MusicCompositionEngine
-- Repositories: IScoreRepository, ISettingsRepository
+- Domain Entities: `Snake`, `Food`, `Apple`, `GameState`
+- Session API: `GameSession`, `GameSessionFactory`
+- Configuration: `GameConfig`
+- Read-only output: `GameSnapshot`
+- Tick output: `GameTickResult` + `TickResult`
+- Status model: `GameStatus` (`Running`, `GameOver`, `LevelComplete`) + `GameOverReason`
+- Value Objects: `GridPosition`, `GridSize`, `Direction`
+- Services: `GameLoopService`, `FoodSpawner`, `GameRules`
+- Tests: package test assembly `SnakeGroove.Core.Tests`
 - 100% тестируемый слой
 
 ## 3.2 Design Patterns
 
-- Strategy (движение)
+- Strategy (planned: future food effects / movement variants)
 - State Machine (экраны)
 - Observer/EventBus (UI/Audio)
-- Factory Method (еда, усиления)
+- Factory / Facade (current: `GameSessionFactory`, `GameSession`; planned: richer food factories)
 - Command (input)
-- Object Pool
-- Repository
-- Service Locator (ограниченно)
+- Object Pool (planned: Food, VFX, AudioSources)
+- Repository (planned: score/settings persistence)
+- Service Locator (not used in core; avoid unless Unity adapter needs a narrow bootstrap helper)
 
 ## 3.3 Dependency Injection
 
-- Constructor Injection
-- Zenject/VContainer для Unity
-- Декуплинг ядра от платформ
+- Constructor Injection in pure core
+- Unity DI (Zenject/VContainer) is optional and future-facing
+- Core remains decoupled from Unity through `GameSession`, `GameTickResult`, and `GameSnapshot`
 
 ## 3.4 Error Handling & Logging
 
@@ -272,11 +276,11 @@ Clean Architecture • SOLID • TDD • CI/CD
 
 - **Паттерн**: Constructor injection
 - **Избегаем**: Singleton hell
-- **Tools**: Zenject/VContainer для Unity DI
+- **Tools**: Zenject/VContainer для Unity DI *(optional, future adapter-level choice)*
 
 ### 5. 📊 Performance First
 
-- **Object Pooling**: Для Food, VFX, AudioSources
+- **Object Pooling**: Planned for Food, VFX, AudioSources after MVP visualization exists
 - **ECS Patterns**: Для будущего масштабирования
 - **Target**: 60 FPS на мобильных устройствах
 
@@ -386,11 +390,11 @@ Agent.ReadRepo → Agent.GenerateCode → Agent.Test → Agent.Commit → Agent.
 ### 9.2 Именование
 
 - Публичные типы и члены: **PascalCase**  
-  `GameManager`, `SnakeRunner`, `SnakeGameService`.
+  `GameManager`, `SnakeRunner`, `GameSessionFactory`, `GameTickResult`.
 - Приватные поля: **_camelCase**  
   `_snakeSegments`, `_inputService`, `_random`.
 - Интерфейсы: **IPascalCase**  
-  `IGridPos`, `ISnakeGameService`.
+  `IGridPos`, `IFoodEffect`, `IScoreRepository` *(для будущих интерфейсов, когда они действительно появятся)*.
 - Константы: **PascalCase**  
   `MaxSnakeLength`, `DefaultSpeed`.
 
@@ -411,4 +415,3 @@ Agent.ReadRepo → Agent.GenerateCode → Agent.Test → Agent.Commit → Agent.
 ---
 
 **End of Unified Architecture v12**
-

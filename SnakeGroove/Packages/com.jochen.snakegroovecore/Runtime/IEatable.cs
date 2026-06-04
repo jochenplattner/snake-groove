@@ -1,15 +1,23 @@
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Интерфейс для объектов, которые можно съесть.
+    /// Represents a grid item that can be eaten by the snake.
     /// </summary>
     public interface IEatable
     {
         /// <summary>
-        /// Позиция съедобного объекта на сетке.
+        /// Position of the item on the grid.
         /// </summary>
         GridPosition Position { get; }
 
-        // TODO: добавить свойства для эффектов (очки, ускорение, замедление) в будущем
+        /// <summary>
+        /// Score added when the item is eaten.
+        /// </summary>
+        int ScoreValue { get; }
+
+        /// <summary>
+        /// Number of snake segments added when the item is eaten.
+        /// </summary>
+        int GrowthAmount { get; }
     }
 }

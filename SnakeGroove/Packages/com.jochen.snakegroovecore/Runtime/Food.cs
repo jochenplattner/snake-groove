@@ -1,26 +1,39 @@
+using System;
+
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Базовый абстрактный класс еды.
+    /// Base class for food items that can be placed on the game grid.
     /// </summary>
     public abstract class Food : IEatable
     {
-        /// <summary>
-        /// Позиция еды на сетке.
-        /// </summary>
+        /// <inheritdoc />
         public GridPosition Position { get; }
 
-        /// <summary>
-        /// Создаёт еду в указанной позиции.
-        /// </summary>
-        /// <param name="position">Позиция еды на сетке.</param>
-        protected Food(GridPosition position)
-        {
-            Position = position;
-        }
+        /// <inheritdoc />
+        public int ScoreValue { get; }
 
-        // TODO: добавить тип еды, эффект, количество очков в будущем
-        // TODO: Lemon : Food — кислый, даёт меньше очков
-        // TODO: Cherry : Food — даёт бонусные очки или ускорение
+        /// <inheritdoc />
+        public int GrowthAmount { get; }
+
+        /// <summary>
+        /// Creates a food item with domain effects attached.
+        /// </summary>
+        protected Food(GridPosition position, int scoreValue, int growthAmount)
+        {
+            if (scoreValue < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(scoreValue), scoreValue, "Score value must be >= 0");
+            }
+
+            if (growthAmount < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(growthAmount), growthAmount, "Growth amount must be >= 0");
+            }
+
+            Position = position;
+            ScoreValue = scoreValue;
+            GrowthAmount = growthAmount;
+        }
     }
 }

@@ -1,39 +1,45 @@
-# 📚 Snake Groove — Project Index
+# Snake Groove - Project Index
 
-Добро пожаловать в главную точку навигации по документации проекта **Snake Groove**. Здесь собраны ссылки на все ключевые файлы, архитектурные документы, отчёты по фазам и важные материалы.
+Главная точка навигации по документации проекта **Snake Groove**.
 
-Этот файл — центральный вход для ChatGPT, GitHub, Codex‑агентов и всей документации проекта.
-
----
-
-# 🏛 Основные документы
-
-### 🔥 Основная архитектура
-
-- [**SNAKE\_ARCHITECTURE.md**](./SNAKE_ARCHITECTURE.md) — главный архитектурный документ проекта.
-  - Содержит полное описание архитектуры, технологий, паттернов, CI/CD и AI‑workflow.
-
-### 🧩 Резюме фаз
-
-- [**snake\_phase\_0\_summary.md**](./snake_phase_0_summary.md) — итог фазы 0 (среда разработки, структура проекта, подготовка к Фазе 1).
-- snake\_phase\_1\_summary.md *(будет создан по окончании фазы 1)*
-- snake\_phase\_2\_summary.md *(планируется)*
-- и т.д.
+Этот файл используется как вход для Codex, GitHub, ChatGPT и будущих агентов. Все ссылки ниже синхронизированы с текущей архитектурой ядра после refactor: `GameSession`, `GameConfig`, `GameTickResult`, `GameSnapshot`, `GameStatus`.
 
 ---
 
-# 🕹 Структура документации
+# Основные документы
 
-```
+## Архитектура
+
+- [**SNAKE_ARCHITECTURE.md**](./SNAKE_ARCHITECTURE.md) — главный архитектурный документ проекта.
+- [**snake_phase_1_in_progress.md**](./snake_phase_1_in_progress.md) — текущий статус Phase 1 и актуальная архитектура чистого C# ядра.
+- [**snake_phase_0_summary.md**](./snake_phase_0_summary.md) — исторический итог Phase 0, обновлённый с учётом текущего Unity-to-Core подхода.
+
+## UML HTML
+
+- [**UML/index.html**](./UML/index.html) — локальный HTML-атлас UML-диаграмм.
+- [**UML/core-package-class-diagram.html**](./UML/core-package-class-diagram.html) — class diagram пакета `com.jochen.snakegroovecore`.
+- [**UML/unity-to-core-sequence-diagram.html**](./UML/unity-to-core-sequence-diagram.html) — sequence flow `SnakeRunner -> GameSession -> GameTickResult/Snapshot`.
+- [**UML/scene-flow-state-diagram.html**](./UML/scene-flow-state-diagram.html) — state diagram сцен Unity.
+- [**UML/clean-architecture-component-diagram.html**](./UML/clean-architecture-component-diagram.html) — component diagram Clean Architecture слоёв.
+
+---
+
+# Структура документации
+
+```text
 /INFOS
+  INDEX.md
   SNAKE_ARCHITECTURE.md
   snake_phase_0_summary.md
-  INDEX.md (этот файл)
+  snake_phase_1_in_progress.md
+  UML/
+    index.html
+    core-package-class-diagram.html
+    unity-to-core-sequence-diagram.html
+    scene-flow-state-diagram.html
+    clean-architecture-component-diagram.html
 ```
-
-#
 
 ---
 
 *End of Project Index*
-

@@ -1,0 +1,21 @@
+{
+  "name": "SnakeGroove.Core.Tests",
+  "rootNamespace": "SnakeGroove.Core.Tests",
+  "references": [
+    "SnakeGroove.Core"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
