@@ -299,18 +299,19 @@ Canvas_MainMenu
 - тест поедания еды, роста и счёта;
 - тест `LevelComplete`;
 - тест `HitWall`;
+- тест запрета разворота на 180 градусов;
+- тест self-collision → `GameOverReason.HitSelf`;
 - тест валидации пересекающихся стартовых сегментов.
 
 Осталось:
-- добавить тест запрета разворота на 180 градусов;
-- добавить тест self-collision → `GameOverReason.HitSelf`;
 - добавить GitHub Actions workflow;
-- убедиться, что `dotnet test` / Unity Test Runner проходят в CI.
+- прогнать package tests через Unity Test Runner / EditMode;
+- решить, будет ли CI запускать Unity Test Runner сразу или начнётся с минимального `dotnet build`.
 
 План CI:
 - добавить GitHub Actions workflow;
-- запускать `dotnet build`;
-- запускать `dotnet test`;
+- на первом этапе запускать `dotnet build`;
+- при возможности добавить запуск Unity Test Runner / EditMode package tests;
 - запускать проверки на push / pull request.
 
 ---
@@ -355,7 +356,7 @@ Canvas_MainMenu
 - Расширить UIScreen анимациями (fade / slide)
 - Раннее подключение аудио-слоя (`AudioLayerManager`)
 - Покрыть Snake Core тестами до усложнения логики
-- Расширить package tests новыми сценариями для еды, self-collision и seed-based random
+- Расширить package tests новыми сценариями для еды и seed-based random
 - Добавить CI-запуск Unity Test Runner / package tests
 - Подумать над event-механизмом поверх `GameTickResult` для UI и Audio слоя
 - В будущем вынести разные типы еды и эффектов через Strategy / Factory
@@ -369,7 +370,7 @@ Canvas_MainMenu
 - Unity bridge / SnakeRunner: 🔄 следующий активный шаг
 - Интеграция с Game-сценой: ⏳ впереди
 - Визуализация: ⏳ впереди
-- Unit-тесты: 🔄 частично готовы
+- Unit-тесты: ✅ базовый набор готов
 - CI: ⏳ впереди
 - Phase 1 summary: ⏳ впереди
 
