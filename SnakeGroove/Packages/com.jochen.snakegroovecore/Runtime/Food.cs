@@ -3,21 +3,21 @@ using System;
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Base class for food items that can be placed on the game grid.
+    /// Базовый класс еды, которую можно разместить на игровой сетке.
     /// </summary>
     public abstract class Food : IEatable
     {
-        /// <inheritdoc />
+        /// Позиция еды на сетке.
         public GridPosition Position { get; }
 
-        /// <inheritdoc />
+        /// Количество очков, которое добавляется при поедании.
         public int ScoreValue { get; }
 
-        /// <inheritdoc />
+        /// Количество сегментов, на которое вырастет змейка.
         public int GrowthAmount { get; }
 
         /// <summary>
-        /// Creates a food item with domain effects attached.
+        /// Создаёт еду с привязанными доменными эффектами.
         /// </summary>
         protected Food(GridPosition position, int scoreValue, int growthAmount)
         {

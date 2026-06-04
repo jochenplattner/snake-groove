@@ -285,17 +285,27 @@ Canvas_MainMenu
 
 ---
 
-### ▶️ Пункт 6 — Тесты и CI
+### 🔄 Пункт 6 — Тесты и CI
 
 Цель: закрепить качество ядра перед усложнением проекта.
 
-План unit-тестов:
-- змейка двигается на одну клетку за тик;
-- разворот на 180 градусов игнорируется;
-- еда увеличивает длину змейки;
-- съедание еды увеличивает `Score`;
-- столкновение со стеной даёт `GameOverReason.HitWall`;
-- столкновение с собой даёт `GameOverReason.HitSelf`.
+**Статус:** PARTIALLY DONE
+
+Уже реализовано:
+- package test assembly `SnakeGroove.Core.Tests`;
+- `GameLoopServiceTests`;
+- `GameSessionFactoryTests`;
+- тест обычного движения;
+- тест поедания еды, роста и счёта;
+- тест `LevelComplete`;
+- тест `HitWall`;
+- тест валидации пересекающихся стартовых сегментов.
+
+Осталось:
+- добавить тест запрета разворота на 180 градусов;
+- добавить тест self-collision → `GameOverReason.HitSelf`;
+- добавить GitHub Actions workflow;
+- убедиться, что `dotnet test` / Unity Test Runner проходят в CI.
 
 План CI:
 - добавить GitHub Actions workflow;
@@ -359,7 +369,7 @@ Canvas_MainMenu
 - Unity bridge / SnakeRunner: 🔄 следующий активный шаг
 - Интеграция с Game-сценой: ⏳ впереди
 - Визуализация: ⏳ впереди
-- Unit-тесты ядра: ✅ package test assembly создана
+- Unit-тесты: 🔄 частично готовы
 - CI: ⏳ впереди
 - Phase 1 summary: ⏳ впереди
 

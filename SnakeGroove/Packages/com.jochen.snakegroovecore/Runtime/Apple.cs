@@ -1,12 +1,12 @@
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Default food for the classic Snake MVP.
+    /// Еда по умолчанию для классической версии змейки.
     /// </summary>
     public sealed class Apple : Food
     {
         /// <summary>
-        /// Creates an apple at the given grid position.
+        /// Создаёт яблоко в указанной позиции сетки.
         /// </summary>
         public Apple(GridPosition position)
             : base(position, scoreValue: 1, growthAmount: 1)

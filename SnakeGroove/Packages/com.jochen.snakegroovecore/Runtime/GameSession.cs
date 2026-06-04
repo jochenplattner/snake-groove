@@ -1,21 +1,24 @@
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Public facade for a running game session.
+    /// Публичный фасад запущенной игровой сессии.
     /// </summary>
     public sealed class GameSession
     {
         private readonly GameLoopService _loop;
 
         /// <summary>
-        /// Configuration used to create the session.
+        /// Конфигурация, с которой была создана сессия.
         /// </summary>
         public GameConfig Config { get; }
 
+        /// <summary>
+        /// Внутреннее изменяемое состояние текущей игровой сессии.
+        /// </summary>
         internal GameState State { get; }
 
         /// <summary>
-        /// Current read-only snapshot.
+        /// Текущий снимок состояния только для чтения.
         /// </summary>
         public GameSnapshot Snapshot => State.CreateSnapshot();
 
@@ -27,7 +30,7 @@ namespace SnakeGroove.Core
         }
 
         /// <summary>
-        /// Advances the session by one domain tick.
+        /// Продвигает сессию на один доменный тик.
         /// </summary>
         public GameTickResult Tick(Direction? inputDirection = null)
         {

@@ -5,44 +5,44 @@ using System.Collections.ObjectModel;
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Immutable configuration used to create a valid game session.
+    /// Неизменяемая конфигурация для создания корректной игровой сессии.
     /// </summary>
     public sealed class GameConfig
     {
         private readonly ReadOnlyCollection<GridPosition> _initialSnakeSegments;
 
         /// <summary>
-        /// Size of the game board.
+        /// Размер игрового поля.
         /// </summary>
         public GridSize GridSize { get; }
 
         /// <summary>
-        /// Initial snake positions. The head is the first item.
+        /// Начальные позиции змейки. Первый элемент — голова.
         /// </summary>
         public IReadOnlyList<GridPosition> InitialSnakeSegments => _initialSnakeSegments;
 
         /// <summary>
-        /// Initial movement direction.
+        /// Начальное направление движения.
         /// </summary>
         public Direction InitialDirection { get; }
 
         /// <summary>
-        /// Domain tick speed hint for adapters.
+        /// Подсказка для адаптеров о скорости доменных тиков.
         /// </summary>
         public int TicksPerSecond { get; }
 
         /// <summary>
-        /// Initial player score.
+        /// Начальный счёт игрока.
         /// </summary>
         public int InitialScore { get; }
 
         /// <summary>
-        /// Optional seed for deterministic food spawning.
+        /// Необязательное зерно случайности для детерминированного создания еды.
         /// </summary>
         public int? RandomSeed { get; }
 
         /// <summary>
-        /// Creates a configuration for a new Snake game.
+        /// Создаёт конфигурацию для новой игры в змейку.
         /// </summary>
         public GameConfig(
             GridSize gridSize,
@@ -107,7 +107,7 @@ namespace SnakeGroove.Core
         }
 
         /// <summary>
-        /// Creates the default Phase 1 classic Snake configuration.
+        /// Создаёт стандартную конфигурацию классической змейки для Фазы 1.
         /// </summary>
         public static GameConfig CreateClassicDefault(int? randomSeed = null)
         {

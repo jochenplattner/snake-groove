@@ -3,20 +3,21 @@ using System;
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Creates fully wired game sessions from validated configuration.
+    /// Создаёт полностью собранные игровые сессии из проверенной конфигурации.
     /// </summary>
     public static class GameSessionFactory
     {
         /// <summary>
-        /// Creates a classic default Snake session.
+        /// Создаёт стандартную классическую сессию змейки.
         /// </summary>
+        /// <param name="randomSeed">Необязательное зерно случайности для повторяемого создания еды.</param>
         public static GameSession CreateClassicDefault(int? randomSeed = null)
         {
             return Create(GameConfig.CreateClassicDefault(randomSeed));
         }
 
         /// <summary>
-        /// Creates a session with the provided configuration.
+        /// Создаёт сессию с переданной конфигурацией.
         /// </summary>
         public static GameSession Create(GameConfig config, Random random = null)
         {

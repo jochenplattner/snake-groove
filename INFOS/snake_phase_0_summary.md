@@ -91,7 +91,7 @@ Assets/
 ```
 snake-groove/
   Packages/
-    com.jochen.snakecore/
+    com.jochen.snakegroovecore/
       package.json
       Runtime/
         Snake.Core.asmdef
@@ -99,6 +99,8 @@ snake-groove/
 
 - Настроено package.json и asmdef
 - Пакет появился в Package Manager в Unity
+
+> Примечание: после профессионального рефакторинга ядра пакет используется как `com.jochen.snakegroovecore`.
 
 
 

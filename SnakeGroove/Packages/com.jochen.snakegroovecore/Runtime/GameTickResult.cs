@@ -1,52 +1,52 @@
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Rich result object returned after one domain tick.
+    /// Подробный результат, который возвращается после одного доменного тика.
     /// </summary>
     public sealed class GameTickResult
     {
         /// <summary>
-        /// High-level tick outcome.
+        /// Общее событие, произошедшее за тик.
         /// </summary>
         public TickResult Outcome { get; }
 
         /// <summary>
-        /// Score added on this tick.
+        /// Очки, добавленные за этот тик.
         /// </summary>
         public int ScoreDelta { get; }
 
         /// <summary>
-        /// Food eaten on this tick, if any.
+        /// Еда, съеденная за этот тик, если она была.
         /// </summary>
         public Food EatenFood { get; }
 
         /// <summary>
-        /// Food spawned after this tick, if any.
+        /// Еда, созданная после этого тика, если она была.
         /// </summary>
         public Food SpawnedFood { get; }
 
         /// <summary>
-        /// Reason for a GameOver outcome.
+        /// Причина результата проигрыша.
         /// </summary>
         public GameOverReason GameOverReason { get; }
 
         /// <summary>
-        /// Snapshot after the tick was applied.
+        /// Снимок состояния после применения тика.
         /// </summary>
         public GameSnapshot Snapshot { get; }
 
         /// <summary>
-        /// Current status after the tick.
+        /// Текущий статус после тика.
         /// </summary>
         public GameStatus Status => Snapshot.Status;
 
         /// <summary>
-        /// True when the tick ended the game with a loss.
+        /// true, если тик завершил игру поражением.
         /// </summary>
         public bool IsGameOver => Outcome == TickResult.GameOver;
 
         /// <summary>
-        /// True when the tick completed the level.
+        /// true, если тик завершил уровень.
         /// </summary>
         public bool IsLevelComplete => Outcome == TickResult.LevelComplete;
 

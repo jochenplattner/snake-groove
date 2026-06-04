@@ -3,7 +3,7 @@ using System;
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Applies one domain tick to a game state.
+    /// Применяет один доменный тик к состоянию игры.
     /// </summary>
     public sealed class GameLoopService
     {
@@ -11,7 +11,7 @@ namespace SnakeGroove.Core
         private readonly FoodSpawner _spawner;
 
         /// <summary>
-        /// Creates a game loop service.
+        /// Создаёт сервис игрового цикла.
         /// </summary>
         public GameLoopService(GameState state, FoodSpawner spawner)
         {
@@ -20,7 +20,7 @@ namespace SnakeGroove.Core
         }
 
         /// <summary>
-        /// Advances the game by one tick.
+        /// Продвигает игру на один тик.
         /// </summary>
         public GameTickResult Tick(Direction? inputDirection = null)
         {

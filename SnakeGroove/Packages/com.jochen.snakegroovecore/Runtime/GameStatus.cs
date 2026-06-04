@@ -1,17 +1,17 @@
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Current lifecycle state of a game session.
+    /// Текущее состояние жизненного цикла игровой сессии.
     /// </summary>
     public enum GameStatus
     {
-        /// <summary>The game is still running.</summary>
+        /// <summary>Игра продолжается.</summary>
         Running,
 
-        /// <summary>The player lost.</summary>
+        /// <summary>Игрок проиграл.</summary>
         GameOver,
 
-        /// <summary>The board was filled and the level is complete.</summary>
+        /// <summary>Поле заполнено, и уровень завершён.</summary>
         LevelComplete
     }
 }

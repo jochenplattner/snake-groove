@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Spawns food in free cells of the game grid.
+    /// Создаёт еду в свободных клетках игровой сетки.
     /// </summary>
     public sealed class FoodSpawner
     {
@@ -12,7 +12,7 @@ namespace SnakeGroove.Core
         private readonly Random _random;
 
         /// <summary>
-        /// Creates a deterministic-friendly food spawner.
+        /// Создаёт генератор еды, удобный для детерминированных тестов.
         /// </summary>
         public FoodSpawner(GridSize gridSize, Random random)
         {
@@ -21,9 +21,9 @@ namespace SnakeGroove.Core
         }
 
         /// <summary>
-        /// Creates food in a random free cell.
+        /// Создаёт еду в случайной свободной клетке.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown when no free cells are available.</exception>
+        /// <exception cref="InvalidOperationException">Возникает, если свободных клеток больше нет.</exception>
         public Food Spawn(IReadOnlyCollection<GridPosition> occupiedPositions)
         {
             if (TrySpawn(occupiedPositions, out var food))
@@ -35,7 +35,7 @@ namespace SnakeGroove.Core
         }
 
         /// <summary>
-        /// Tries to create food in a random free cell.
+        /// Пытается создать еду в случайной свободной клетке.
         /// </summary>
         public bool TrySpawn(IReadOnlyCollection<GridPosition> occupiedPositions, out Food food)
         {

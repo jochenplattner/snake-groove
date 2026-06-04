@@ -4,52 +4,52 @@ using System.Collections.Generic;
 namespace SnakeGroove.Core
 {
     /// <summary>
-    /// Holds the mutable domain state of a running game.
+    /// Хранит изменяемое доменное состояние запущенной игры.
     /// </summary>
     public sealed class GameState
     {
         /// <summary>
-        /// Size of the game grid.
+        /// Размер игровой сетки.
         /// </summary>
         public GridSize GridSize { get; }
 
         /// <summary>
-        /// Snake in the current game state.
+        /// Змейка в текущем состоянии игры.
         /// </summary>
         public Snake Snake { get; }
 
         /// <summary>
-        /// Current food on the board. Null when the level is complete.
+        /// Текущая еда на поле. null, если уровень завершён.
         /// </summary>
         public Food Food { get; private set; }
 
         /// <summary>
-        /// Current lifecycle status.
+        /// Текущий статус жизненного цикла.
         /// </summary>
         public GameStatus Status { get; private set; }
 
         /// <summary>
-        /// True when the player lost.
+        /// true, если игрок проиграл.
         /// </summary>
         public bool IsGameOver => Status == GameStatus.GameOver;
 
         /// <summary>
-        /// True when the board is filled.
+        /// true, если поле полностью заполнено.
         /// </summary>
         public bool IsLevelComplete => Status == GameStatus.LevelComplete;
 
         /// <summary>
-        /// Reason for a GameOver status.
+        /// Причина статуса проигрыша.
         /// </summary>
         public GameOverReason GameOverReason { get; private set; }
 
         /// <summary>
-        /// Player score.
+        /// Счёт игрока.
         /// </summary>
         public int Score { get; private set; }
 
         /// <summary>
-        /// Creates game state with validated starting data.
+        /// Создаёт состояние игры с проверенными стартовыми данными.
         /// </summary>
         public GameState(GridSize gridSize, Snake snake, Food initialFood, int initialScore = 0)
         {
@@ -98,7 +98,7 @@ namespace SnakeGroove.Core
         }
 
         /// <summary>
-        /// Creates a read-only snapshot for adapters and UI.
+        /// Создаёт снимок только для чтения для адаптеров и UI.
         /// </summary>
         public GameSnapshot CreateSnapshot()
         {

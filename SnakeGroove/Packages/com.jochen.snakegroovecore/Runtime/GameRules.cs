@@ -12,7 +12,7 @@ namespace SnakeGroove.Core
         /// </summary>
         /// <param name="pos">Позиция для проверки.</param>
         /// <param name="size">Размер игровой сетки.</param>
-        /// <returns>True, если позиция за пределами сетки.</returns>
+        /// <returns>true, если позиция за пределами сетки.</returns>
         public static bool IsOutsideBounds(GridPosition pos, GridSize size)
         {
             return pos.X < 0 || pos.Y < 0 || pos.X >= size.Width || pos.Y >= size.Height;
@@ -24,7 +24,7 @@ namespace SnakeGroove.Core
         /// <param name="nextHead">Позиция, куда переместится голова.</param>
         /// <param name="segments">Текущие сегменты змейки.</param>
         /// <param name="allowTailPass">Если true — хвост (последний сегмент) не учитывается при проверке (он освободится).</param>
-        /// <returns>True, если произойдёт столкновение.</returns>
+        /// <returns>true, если произойдёт столкновение.</returns>
         public static bool IsSelfCollision(GridPosition nextHead, IReadOnlyList<GridPosition> segments, bool allowTailPass)
         {
             if (segments == null || segments.Count == 0)
