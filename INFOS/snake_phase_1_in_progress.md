@@ -293,6 +293,7 @@ Canvas_MainMenu
 
 Уже реализовано:
 - package test assembly `SnakeGroove.Core.Tests`;
+- standalone .NET test project `tests/SnakeGroove.Core.Tests`;
 - `GameLoopServiceTests`;
 - `GameSessionFactoryTests`;
 - тест обычного движения;
@@ -301,16 +302,17 @@ Canvas_MainMenu
 - тест `HitWall`;
 - тест запрета разворота на 180 градусов;
 - тест self-collision → `GameOverReason.HitSelf`;
-- тест валидации пересекающихся стартовых сегментов.
+- тест валидации пересекающихся стартовых сегментов;
+- GitHub Actions workflow `.github/workflows/core-tests.yml` для pure C# core-тестов;
+- локальная проверка `dotnet test tests/SnakeGroove.Core.Tests/SnakeGroove.Core.Tests.csproj` проходит: 8/8 tests passed.
 
 Осталось:
-- добавить GitHub Actions workflow;
 - прогнать package tests через Unity Test Runner / EditMode;
-- решить, будет ли CI запускать Unity Test Runner сразу или начнётся с минимального `dotnet build`.
+- проверить первый GitHub Actions run после push / pull request;
+- позже решить, добавлять ли Unity Test Runner в CI.
 
 План CI:
-- добавить GitHub Actions workflow;
-- на первом этапе запускать `dotnet build`;
+- на первом этапе запускать `dotnet test` для standalone pure C# test project;
 - при возможности добавить запуск Unity Test Runner / EditMode package tests;
 - запускать проверки на push / pull request.
 
@@ -371,7 +373,7 @@ Canvas_MainMenu
 - Интеграция с Game-сценой: ⏳ впереди
 - Визуализация: ⏳ впереди
 - Unit-тесты: ✅ базовый набор готов
-- CI: ⏳ впереди
+- CI: 🔄 core workflow настроен, ждёт проверки на GitHub
 - Phase 1 summary: ⏳ впереди
 
 📌 Этот файл является **центральной точкой отсчёта Фазы 1** и используется как база для всех дальнейших чатов и решений.

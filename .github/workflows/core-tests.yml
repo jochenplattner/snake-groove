@@ -1,0 +1,32 @@
+name: Core Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  core-tests:
+    name: Pure C# Core Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore tests/SnakeGroove.Core.Tests/SnakeGroove.Core.Tests.csproj
+
+      - name: Test
+        run: dotnet test tests/SnakeGroove.Core.Tests/SnakeGroove.Core.Tests.csproj --configuration Release --no-restore --logger "trx;LogFileName=core-tests.trx" --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-test-results
+          path: TestResults/core-tests.trx

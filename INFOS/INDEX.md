@@ -13,6 +13,7 @@
 - [**SNAKE_ARCHITECTURE.md**](./SNAKE_ARCHITECTURE.md) — главный архитектурный документ проекта.
 - [**snake_phase_1_in_progress.md**](./snake_phase_1_in_progress.md) — текущий статус Phase 1 и актуальная архитектура чистого C# ядра.
 - [**snake_phase_0_summary.md**](./snake_phase_0_summary.md) — исторический итог Phase 0, обновлённый с учётом текущего Unity-to-Core подхода.
+- [**core_ci.md**](./core_ci.md) — как устроены pure C# core-тесты и где смотреть GitHub Actions.
 
 ## UML HTML
 
@@ -30,6 +31,7 @@
 /INFOS
   INDEX.md
   SNAKE_ARCHITECTURE.md
+  core_ci.md
   snake_phase_0_summary.md
   snake_phase_1_in_progress.md
   UML/

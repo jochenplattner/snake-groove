@@ -49,6 +49,14 @@ ExportedObj/
 *.opendb
 *.VC.db
 
+# Keep the standalone .NET core test project tracked for CI.
+!tests/**/*.csproj
+
+# Standalone .NET test project outputs
+tests/**/bin/
+tests/**/obj/
+TestResults/
+
 # Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta
