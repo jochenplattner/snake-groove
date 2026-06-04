@@ -16,8 +16,4 @@
     <Compile Include="../../SnakeGroove/Packages/com.jochen.snakegroovecore/Runtime/**/*.cs" LinkBase="Core" />
     <Compile Include="../../SnakeGroove/Packages/com.jochen.snakegroovecore/Tests/Runtime/*.cs" LinkBase="UnityPackageTests" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Packages\com.jochen.snakegroovecore\Tests\Runtime\" />
-  </ItemGroup>
 </Project>
