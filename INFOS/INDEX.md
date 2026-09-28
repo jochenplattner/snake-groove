@@ -1,37 +1,67 @@
-# Snake Groove - Project Index
+# Snake Groove - индекс документации
 
-Главная точка навигации по документации проекта **Snake Groove**.
+Это главная точка входа в документацию проекта. Здесь зафиксировано, какой файл за что отвечает и в каком порядке их читать.
 
-Этот файл используется как вход для Codex, GitHub, ChatGPT и будущих агентов. Все ссылки ниже синхронизированы с текущей архитектурой ядра после refactor: `GameSession`, `GameConfig`, `GameTickResult`, `GameSnapshot`, `GameStatus`.
+## Текущий снимок проекта
 
----
+- Unity: `6000.3.7f1`.
+- Текущая фаза: Фаза 1 - Classic Snake MVP.
+- Чистое C# ядро: готово как embedded package `com.jochen.snakegroovecore`.
+- Core-тесты: 8 тестов, локальный запуск и GitHub Actions проходят.
+- Unity MCP: настроен и проверен после полного перезапуска Codex и Unity Editor.
+- Активная игровая задача: реализовать `SnakeRunner` и подключить ядро к сцене `Game`.
 
-# Основные документы
+## Порядок чтения
 
-## Архитектура
+1. [snake_phase_1_in_progress.md](./snake_phase_1_in_progress.md) - где проект находится сейчас и что делать дальше.
+2. [SNAKE_ARCHITECTURE.md](./SNAKE_ARCHITECTURE.md) - действующая архитектура и границы слоёв.
+3. [unity_codex_mcp.md](./unity_codex_mcp.md) - отдельный план подключения Unity Editor к Codex.
+4. [core_ci.md](./core_ci.md) - устройство pure C# тестового проекта и GitHub Actions.
+5. [snake_phase_0_summary.md](./snake_phase_0_summary.md) - закрытый исторический отчёт о Фазе 0.
 
-- [**SNAKE_ARCHITECTURE.md**](./SNAKE_ARCHITECTURE.md) — главный архитектурный документ проекта.
-- [**snake_phase_1_in_progress.md**](./snake_phase_1_in_progress.md) — текущий статус Phase 1 и актуальная архитектура чистого C# ядра.
-- [**snake_phase_0_summary.md**](./snake_phase_0_summary.md) — исторический итог Phase 0, обновлённый с учётом текущего Unity-to-Core подхода.
-- [**core_ci.md**](./core_ci.md) — как устроены pure C# core-тесты и где смотреть GitHub Actions.
+## Что является источником правды
 
-## UML HTML
+| Вопрос | Документ |
+| --- | --- |
+| Архитектурные правила и зависимости | `SNAKE_ARCHITECTURE.md` |
+| Текущий статус и очередь работ | `snake_phase_1_in_progress.md` |
+| Настройка Unity MCP | `unity_codex_mcp.md` |
+| Запуск и диагностика core CI | `core_ci.md` |
+| История завершённой Фазы 0 | `snake_phase_0_summary.md` |
 
-- [**UML/index.html**](./UML/index.html) — локальный HTML-атлас UML-диаграмм.
-- [**UML/core-package-class-diagram.html**](./UML/core-package-class-diagram.html) — class diagram пакета `com.jochen.snakegroovecore`.
-- [**UML/unity-to-core-sequence-diagram.html**](./UML/unity-to-core-sequence-diagram.html) — sequence flow `SnakeRunner -> GameSession -> GameTickResult/Snapshot`.
-- [**UML/scene-flow-state-diagram.html**](./UML/scene-flow-state-diagram.html) — state diagram сцен Unity.
-- [**UML/clean-architecture-component-diagram.html**](./UML/clean-architecture-component-diagram.html) — component diagram Clean Architecture слоёв.
+При расхождении старой формулировки с текущим статусом приоритет имеет `snake_phase_1_in_progress.md`, а для устройства кода - `SNAKE_ARCHITECTURE.md`.
 
----
+## UML-атлас
 
-# Структура документации
+- [UML/index.html](./UML/index.html) - главная страница диаграмм.
+- [UML/core-package-class-diagram.html](./UML/core-package-class-diagram.html) - классы пакета ядра.
+- [UML/unity-to-core-sequence-diagram.html](./UML/unity-to-core-sequence-diagram.html) - последовательность `Unity -> GameSession -> GameTickResult`.
+- [UML/scene-flow-state-diagram.html](./UML/scene-flow-state-diagram.html) - переходы между сценами.
+- [UML/clean-architecture-component-diagram.html](./UML/clean-architecture-component-diagram.html) - компоненты Clean Architecture.
+
+HTML-диаграммы используются как визуальный атлас. При изменении публичного API ядра, порядка сцен или границ слоёв их нужно обновлять вместе с Markdown-документацией.
+
+## Ближайший маршрут
 
 ```text
-/INFOS
+Core + 8 тестов + зелёный Core CI
+  -> Unity to Codex MCP proof of concept: DONE
+  -> SnakeRunner
+  -> SnakeView и FoodView
+  -> Unity EditMode/PlayMode проверки
+  -> Classic Snake MVP
+  -> музыка и полировка
+  -> сборки Windows, WebGL и Android
+```
+
+## Состав папки
+
+```text
+INFOS/
   INDEX.md
   SNAKE_ARCHITECTURE.md
   core_ci.md
+  unity_codex_mcp.md
   snake_phase_0_summary.md
   snake_phase_1_in_progress.md
   UML/
@@ -41,7 +71,3 @@
     scene-flow-state-diagram.html
     clean-architecture-component-diagram.html
 ```
-
----
-
-*End of Project Index*

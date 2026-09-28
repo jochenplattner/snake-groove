@@ -1,417 +1,308 @@
-# 🎮 Snake Groove — Unified Architecture Specification (v12)
+# Snake Groove - архитектура проекта
 
-> **Статус:** актуально для Unity 6.2 LTS, Visual Studio 2026, .NET 10 LTS
-> **Фаза проекта:** завершена Фаза 0, начинается Фаза 1 (MVP)
-> **Связанные документы:** [Фаза 0 — итоговый отчёт](./snake_phase_0_summary.md)
- (v12)
+> Версия документа: 13
+>
+> Актуально для: Unity `6000.3.7f1`, Фаза 1
+>
+> Главный принцип: игровое ядро не зависит от Unity
 
-> **Главный архитектурный документ проекта Snake Groove**
+## 1. Цель продукта
 
----
+Snake Groove начинается как качественная классическая Snake, а затем получает музыкальную механику: съеденная еда добавляет или изменяет музыкальные слои. Архитектура должна позволить развивать игру без переноса правил движения, счёта и столкновений в `MonoBehaviour`.
 
-# 🟦 0. Motivation, Principles & Learning
+Цель Фазы 1 - играбельный Classic Snake MVP:
 
-## 0.1 Motivation During the Process
+- меню и переход в игру;
+- управление змейкой;
+- движение по клеткам;
+- еда, рост и счёт;
+- столкновение со стеной и телом;
+- завершение уровня при заполнении поля;
+- минимальная визуализация;
+- проверяемое pure C# ядро.
 
-- Каждое действие связывается с большой картиной развития Snake Groove.
-- Проект — тренировочная площадка разработки архитектуры, паттернов, CI/CD.
-- Формируем привычку фиксировать маленькие победы.
+Музыка, сложные эффекты, дополнительные режимы и монетизация не входят в Фазу 1.
 
-## 0.2 Motivational Vision
+## 2. Архитектурное правило
 
-Создать **музыкальную, динамичную и мультяшную версию Snake**, которая:
+Зависимости направлены только внутрь, к игровому ядру:
 
-- Добавляет музыкальный **аудио‑слой** за каждую съеденную еду.
-- Имеет мягкую, мультяшную графику.
-- Строится по принципам **Clean Architecture**.
-- Готова к масштабированию, публикации и монетизации.
-- Идеи для расширения: 
-   - на двоих играть (vs-, coop-mode) : 
-      кто больше очков наберёт, 
-	  у каждого свой дисплей с собранными вещами
-   - двигающийся экран / сплит скрин и т.д.
-   - прыжок через клетку или несколько (потом всё тело за головой прыгает)
-   - сжатие тела в точку, остановка, движение дальше в каком-либо направлении  
-
-## 0.3 Principles
-
-- Clean Architecture, SOLID, KISS, DRY, YAGNI.
-- Ядро отделено от движка.
-- Кроссплатформенность: Unity → Win/WebGL → Mobile.
-- CI/CD: GitHub Actions + Unity Cloud Build.
-- Расширяемость через `// TODO` метки.
-- Устойчивость: Logging, Exception Handling.
-
----
-
-# 🟦 1. Vision & Core Loop
-
-## 1.1 Key Concept
-
-**Аркадный Snake + музыкальный твист:**
-
-- каждая еда добавляет новый **инструмент**;
-- уровни могут иметь **свои эффекты**:
-  - Горы → эхо, замедление.
-  - Лес → визуальный фильтр.
-  - Вода → ускорение, dampened sound.
-
-## 1.2 MVP Phase 1 Goal
-
-**Классический Snake с чистым ядром**:
-
-- движение;
-- еда;
-- рост;
-- столкновения;
-- игровое поле;
-- простое меню.
-
----
-
-# 🟦 2. Milestone Roadmap
-
-| Phase | Output            | Platforms       | Key Features                                |
-| ----- | ----------------- | --------------- | ------------------------------------------- |
-| 0     | Setup             | n/a             | Repo, CI/CD, URP project, architecture, LFS |
-| 1     | Classic Snake MVP | Windows + WebGL | Меню, игра, еда, рост, коллизии             |
-| 2     | Music Layers      | + Mobile        | Процедурная музыка, аудио‑миксер            |
-| 3     | Advanced Gameplay | All             | Диагонали, камера, местности                |
-| 4     | Monetization      | All             | IAP, скины, LiveOps                         |
-
-Фазы ведутся в отдельных чатах. Итоги заносятся в этот документ.
-
----
-
-# 🟦 3. High-Level Architecture
-
-```
-┌──────────────────────────────┐
-│   📦 Core.GameLogic (.NET 8)  │
-│   • Domain Entities           │
-│   • Value Objects             │
-│   • Services                  │
-│   • Interfaces                │
-│   • Events                    │
-└──────────────▲───────────────┘
-               │
-┌──────────────┴──────────────┐      
-│  Unity Adapter Layer         │
-│  • SceneFlowController       │
-│  • UnityGameAdapter          │
-│  • Input Bridge              │
-│  • Repositories              │
-└──────────────▲──────────────┘
-               │
-┌──────────────┴──────────────┐
-│     Presentation Layer       │
-│  • UI (MVVM)                 │
-│  • Rendering                 │
-│  • Audio                     │
-│  • VFX                       │
-└──────────────────────────────┘
+```text
+Unity Presentation
+(UI, SnakeView, FoodView, Audio, Camera)
+        |
+        v
+Unity Adapters
+(SnakeRunner, input, scene flow, persistence)
+        |
+        v
+Pure C# Core
+(GameSession, rules, state, value objects)
 ```
 
-## 3.1 Core.GameLogic (Pure C#)
+Core не знает о `UnityEngine`, сценах, `GameObject`, вводе, спрайтах, звуке или файловой системе. Unity может зависеть от Core. Обратная зависимость запрещена.
 
-- Domain Entities: `Snake`, `Food`, `Apple`, `GameState`
-- Session API: `GameSession`, `GameSessionFactory`
-- Configuration: `GameConfig`
-- Read-only output: `GameSnapshot`
-- Tick output: `GameTickResult` + `TickResult`
-- Status model: `GameStatus` (`Running`, `GameOver`, `LevelComplete`) + `GameOverReason`
-- Value Objects: `GridPosition`, `GridSize`, `Direction`
-- Services: `GameLoopService`, `FoodSpawner`, `GameRules`
-- Tests: package test assembly `SnakeGroove.Core.Tests`
-- 100% тестируемый слой
+## 3. Слои
 
-## 3.2 Design Patterns
+### 3.1 Pure C# Core
 
-- Strategy (planned: future food effects / movement variants)
-- State Machine (экраны)
-- Observer/EventBus (UI/Audio)
-- Factory / Facade (current: `GameSessionFactory`, `GameSession`; planned: richer food factories)
-- Command (input)
-- Object Pool (planned: Food, VFX, AudioSources)
-- Repository (planned: score/settings persistence)
-- Service Locator (not used in core; avoid unless Unity adapter needs a narrow bootstrap helper)
+Расположение:
 
-## 3.3 Dependency Injection
-
-- Constructor Injection in pure core
-- Unity DI (Zenject/VContainer) is optional and future-facing
-- Core remains decoupled from Unity through `GameSession`, `GameTickResult`, and `GameSnapshot`
-
-## 3.4 Error Handling & Logging
-
-- Global exception boundary
-- Serilog (Console, File, Seq)
-- Unity Cloud Diagnostics
-
----
-
-# 🟦 4. UI / UX Design
-
-### Main Menu
-
-- Мультяшный стиль, лёгкие переливы.
-- Кнопки: Start, Settings, Exit.
-
-### Settings
-
-- Размер поля
-- Громкость
-- Тема оформления
-
-### HUD
-
-- Счёт
-- Длина змейки
-- Power‑Ups
-
-### Visual Style
-
-- Мягкие анимации
-- Яркие цвета
-- Pixel Perfect Camera
-
----
-
-# 🟦 5. Toolchain & Environments
-
-### IDE
-
-- **Visual Studio 2026 (Stable/Insiders)** + GitHub Copilot
-- Visual Studio 2022 (fallback)
-- VS Code + Codex CLI (новое)
-- Rider (опционально)
-
-### Game Engine
-
-- Unity 6.2 LTS (URP 2D)
-- WebGL / Windows / Android
-
-### Build Tools
-
-- **.NET 10 LTS SDK** (основной для новых тулзов и сервисов)
-- .NET 8 LTS SDK (совместимость с Unity)
-- Unity CLI
-- GitHub Actions
-
-### SCM
-
-- GitHub + Git LFS
-
----
-
-# 🟦 6. Phase 0 Summary (Integrated)
-
-> Подробная версия Phase 0: см. [snake_phase_0_summary.md](./snake_phase_0_summary.md)
-
-
-Phase 0 Summary (Integrated)
-
-### Installed
-
-- Windows 11 Pro
-- Unity 6.2 URP 2D Template
-- VS 2022 + Copilot
-- Git + Git LFS
-- GitHub Desktop
-- OneDrive (backup)
-
-### Created
-
-- Repo: `snake-groove` (MIT)
-- Project structure with Assets/Scenes (Boot/MainMenu/Game)
-- Basic Scripts folder structure
-- LFS configured
-
-### Prepared & verified
-
-- Scene flow Boot → MainMenu → Game
-
-### Remaining tasks at end of Phase 0
-
-0. Core scripts in Unity A. Scene transitions test B. Embedded package creation C. Pure C# core D. Unity integration layer
-
-Phase 1 начинается отсюда.
-
----
-
-# 🟦 7. Full Architecture&#x20;
-
----
-
-# 🎮 Snake Groove - Professional Game Architecture v11
-
-**Аркадный Snake с музыкальным твистом**\
-Clean Architecture • SOLID • TDD • CI/CD
-
----
-
-## 🎯 Industry Best Practices
-
-### 1. 🏗️ Clean Architecture
-
-- **Описание**: Core → Adapters → Presentation
-- **Детали**: Domain независим от UI/фреймворков
-- **Преимущества**: Тестируемость, переиспользование, масштабируемость
-
-### 2. ✨ SOLID Principles
-
-- **Single Responsibility**: Каждый класс делает одну вещь
-- **Open/Closed**: Открыт для расширения, закрыт для изменения
-- **Liskov Substitution**: Подтипы взаимозаменяемы
-- **Interface Segregation**: Клиенты не зависят от неиспользуемых методов
-- **Dependency Inversion**: Зависимость от абстракций, а не конкретики
-
-### 3. 🧪 Test-Driven Development
-
-- **Coverage**: 80%+ для Core.GameLogic
-- **Frameworks**: NUnit для unit тестов, Unity Test Framework для интеграции
-- **CI/CD**: Автоматические тесты в GitHub Actions
-
-### 4. 🔄 Dependency Injection
-
-- **Паттерн**: Constructor injection
-- **Избегаем**: Singleton hell
-- **Tools**: Zenject/VContainer для Unity DI *(optional, future adapter-level choice)*
-
-### 5. 📊 Performance First
-
-- **Object Pooling**: Planned for Food, VFX, AudioSources after MVP visualization exists
-- **ECS Patterns**: Для будущего масштабирования
-- **Target**: 60 FPS на мобильных устройствах
-
-### 6. 📝 Clean Code
-
-- **Приоритет**: Читаемость > краткость
-- **Documentation**: Self-documenting code, XML docs для public API
-- **Standards**: Соблюдение C# coding conventions
-
-### 7. 🔐 Error Resilience
-
-- **Defensive Programming**: Try-catch boundaries
-- **Validation**: Null checks, parameter validation
-- **Logging**: Serilog для структурированного логирования
-
-### 8. 🚀 CI/CD Automation
-
-- **Pipeline**: Push → Build → Test → Deploy
-- **Tools**: GitHub Actions, Unity Cloud Build
-- **Automation**: Автоматические билды и тесты
-
-### 9. 📈 Data-Driven Design
-
-- **Configuration**: ScriptableObjects для настроек
-- **Benefits**: Дизайнеры настраивают без кода
-- **Flexibility**: Быстрые итерации и A/B тестирование
-
----
-
-# 🏛️ Architecture Layers
-
----
-
-# 🟦 8. AI Development Workflow
-
-## 8.1 Goals
-
-Использовать ИИ для:
-
-- генерации архитектуры;
-- написания кода;
-- написания тестов;
-- code-review;
-- создания Pull Requests;
-- анализа репозитория;
-- работы в фоне (background agents).
-
-## 8.2 Tools
-
-### Codex CLI
-
-- Локальный агент разработки.
-- Может читать файлы, анализировать проект, генерировать код.
-- Способен создавать PR через GitHub API.
-- Можно запускать "как процесс" для авто‑рефакторинга.
-
-### GitHub Copilot
-
-- Работа непосредственно в IDE.
-- Подсказки, автодополнения, объяснения.
-- Хорош для итеративного мелкого кода.
-
-### Background AI Agents
-
-```
-Agent.ReadRepo → Agent.GenerateCode → Agent.Test → Agent.Commit → Agent.PR
+```text
+SnakeGroove/Packages/com.jochen.snakegroovecore/
 ```
 
-- могут работать как CI/CD боты;
-- проверять архитектурные несоответствия;
-- запускаться в GitHub Actions.
+Назначение:
 
-## 8.3 Suggested Workflow
+- хранить состояние игровой сессии;
+- применять направление игрока;
+- выполнять один дискретный тик;
+- проверять правила движения и столкновений;
+- изменять длину и счёт;
+- создавать еду только в свободной клетке;
+- возвращать неизменяемый снимок состояния.
 
-1. **Codex CLI** создаёт структуру и код.
-2. Ты проверяешь и корректируешь.
-3. Codex пишет unit‑тесты.
-4. Codex формирует Pull Request.
-5. Copilot в IDE помогает улучшать локальные мелкие детали.
-6. Background Agent смотрит PR и делает code‑review.
+Ключевые типы:
 
-## 8.4 GitHub Integration
+| Группа | Типы | Ответственность |
+| --- | --- | --- |
+| Координаты | `GridPosition`, `GridSize`, `Direction` | Значения сетки и направления |
+| Сущности | `Snake`, `Food`, `Apple`, `IEatable` | Змейка и съедаемые объекты |
+| Состояние | `GameState`, `GameStatus`, `GameOverReason` | Внутреннее изменяемое состояние сессии |
+| Правила | `GameRules`, `FoodSpawner`, `GameLoopService` | Один тик, коллизии, появление еды |
+| Публичный API | `GameConfig`, `GameSessionFactory`, `GameSession` | Создание и использование сессии |
+| Результат | `GameTickResult`, `TickResult`, `GameSnapshot` | Ответ ядра для внешнего слоя |
 
-- Подключение через **PAT Token**.
-- Доступ к дереву файлов.
-- Создание / обновление PR.
-- Inline‑review.
-- Авто‑commit от имени бота.
+`GameSession` является фасадом ядра. Unity не должна напрямую менять `GameState` или список сегментов.
 
----
+### 3.2 Unity Adapters
 
-## 9. Coding Style & .editorconfig
+Текущее расположение инфраструктуры:
 
-Для проекта Snake Groove используется единый стиль кода, зафиксированный в файле `.editorconfig` в корне репозитория.
+```text
+SnakeGroove/Assets/Scripts/Infrastructure/
+  BootLoader.cs
+  EventBus.cs
+  GameManager.cs
+```
 
-### 9.1 Базовые правила
+Планируемое расположение игрового адаптера:
 
-- Отступы: **4 пробела**, без табов.
-- Скобки: открывающая `{` **на новой строке** (`csharp_new_line_before_open_brace = all`).
-- Концовка строки: **CRLF**.
-- Кодировка: **UTF-8**.
-- Автоматически:
-  - обрезаются пробелы в конце строк;
-  - добавляется финальная пустая строка в файл;
-  - сортируются и группируются `using` (System — первым).
+```text
+SnakeGroove/Assets/Scripts/Gameplay/
+  SnakeRunner.cs
+```
 
-### 9.2 Именование
+`SnakeRunner` отвечает за:
 
-- Публичные типы и члены: **PascalCase**  
-  `GameManager`, `SnakeRunner`, `GameSessionFactory`, `GameTickResult`.
-- Приватные поля: **_camelCase**  
-  `_snakeSegments`, `_inputService`, `_random`.
-- Интерфейсы: **IPascalCase**  
-  `IGridPos`, `IFoodEffect`, `IScoreRepository` *(для будущих интерфейсов, когда они действительно появятся)*.
-- Константы: **PascalCase**  
-  `MaxSnakeLength`, `DefaultSpeed`.
+- создание `GameSession` через `GameSessionFactory`;
+- чтение пользовательского ввода;
+- преобразование ввода Unity в `Direction`;
+- вызов `GameSession.Tick(...)` с заданной частотой;
+- передачу `GameSnapshot` представлению;
+- реакцию на `GameOver` и `LevelComplete`.
 
-### 9.3 Инструменты
+В `SnakeRunner` не должны появляться собственные правила коллизий, роста, счёта или спауна еды.
 
-- Visual Studio 2026 использует **Code Cleanup on Save**, который применяет правила `.editorconfig`.
-- GitHub Copilot / Codex CLI генерируют код в соответствии с этим стилем.
-- Любой участник команды при клонировании репозитория автоматически получает одинаковый стиль без ручной настройки IDE.
+### 3.3 Presentation
 
----
+Текущее UI:
 
-# 🟦 10. Final Notes
+```text
+SnakeGroove/Assets/Scripts/UI/Screens/
+  UIScreen.cs
+  MainMenuScreen.cs
+  SettingsScreen.cs
+```
 
-- Документ является *главным источником правды*.
-- Обновляется при завершении каждой фазы.
-- Используется для контекста ИИ‑агентов.
+Планируемое представление игры:
 
----
+```text
+SnakeView       # отображает сегменты из Snapshot
+FoodView        # отображает текущую еду
+GameHud         # отображает счёт и состояние
+```
 
-**End of Unified Architecture v12**
+Presentation получает готовые данные и отображает их. Он не принимает решений о правилах игры.
+
+### 3.4 Infrastructure
+
+`BootLoader`, `GameManager` и `EventBus` обеспечивают жизненный цикл Unity-приложения, переходы и слабую связь между Unity-компонентами. По мере роста проекта сюда могут добавиться сохранение настроек, рекордов и платформенные сервисы.
+
+Новые библиотеки DI, логирования или persistence подключаются только при появлении конкретной задачи. Сейчас VContainer, Serilog, Unity Cloud Build и Unity Cloud Diagnostics не являются частью реализованной архитектуры.
+
+## 4. Игровой поток
+
+```text
+Игрок нажимает клавишу
+  -> SnakeRunner запоминает допустимое направление
+  -> таймер SnakeRunner вызывает GameSession.Tick(direction)
+  -> GameLoopService применяет правила
+  -> GameTickResult сообщает исход тика
+  -> GameSnapshot содержит новое состояние
+  -> SnakeView, FoodView и HUD обновляют отображение
+```
+
+Один тик выполняется в следующем порядке:
+
+1. принять новое направление, если оно не противоположно текущему;
+2. вычислить следующую позицию головы;
+3. проверить выход за границу;
+4. определить, будет ли съедена еда;
+5. проверить столкновение с телом с учётом освобождающегося хвоста;
+6. переместить или вырастить змейку;
+7. изменить счёт;
+8. создать новую еду или вернуть `LevelComplete`;
+9. вернуть `GameTickResult` и новый `GameSnapshot`.
+
+## 5. Состояния игры и сцен
+
+Состояние pure C# сессии:
+
+```text
+Running
+  -> GameOver (HitWall или HitSelf)
+  -> LevelComplete
+```
+
+Поток Unity-сцен:
+
+```text
+Boot -> MainMenu -> Game
+```
+
+Все три рабочие сцены включены в Build Settings. `SampleScene` оставлена выключенной и не участвует в игровом потоке.
+
+## 6. Структура репозитория
+
+```text
+snake-groove/
+  .github/workflows/
+    core-tests.yml
+
+  INFOS/
+    INDEX.md
+    SNAKE_ARCHITECTURE.md
+    core_ci.md
+    unity_codex_mcp.md
+    snake_phase_0_summary.md
+    snake_phase_1_in_progress.md
+    UML/
+
+  SnakeGroove/
+    Assets/
+      Art/
+      Audio/
+      Prefabs/
+      Scenes/
+        Boot.unity
+        MainMenu.unity
+        Game.unity
+      Scripts/
+        Infrastructure/
+        Gameplay/
+        UI/
+      Tests/
+    Packages/
+      com.jochen.snakegroovecore/
+        Runtime/
+        Tests/Runtime/
+
+  tests/
+    SnakeGroove.Core.Tests/
+```
+
+Папка `Gameplay` уже подготовлена, но `SnakeRunner` и игровые View-компоненты ещё не реализованы.
+
+## 7. Тестирование
+
+### Реализовано
+
+- package test assembly `SnakeGroove.Core.Tests`;
+- standalone test host `tests/SnakeGroove.Core.Tests` на `net8.0`;
+- единый набор из 8 NUnit-тестов;
+- локальный запуск через `dotnet test`;
+- GitHub Actions workflow `Core Tests`;
+- зелёный core CI на `push` и `pull_request`.
+
+Подробности: [core_ci.md](./core_ci.md).
+
+### Следующий уровень тестов
+
+После появления Unity-адаптера нужны:
+
+- EditMode тесты преобразования конфигурации и данных;
+- PlayMode тест базового запуска сцены `Game`;
+- проверка, что `SnakeRunner` создаёт сессию и выполняет тики;
+- проверка отображения `GameOver` и `LevelComplete`;
+- решение, нужен ли Unity Test Runner в GitHub Actions.
+
+Цель покрытия задаётся сценариями и рисками. Число процентов не объявляется достигнутым без отчёта coverage.
+
+## 8. Unity to Codex MCP
+
+Unity MCP является инструментом разработки, а не частью игры и не runtime-зависимостью.
+
+Планируемый цикл:
+
+```text
+Codex читает Unity Console и сцену
+  -> изменяет код в Git-контролируемых файлах
+  -> просит Unity обновить ассеты и скомпилировать
+  -> запускает тесты и Play Mode
+  -> проверяет Game View
+```
+
+Выбран официальный Unity CLI с MCP-сервером и пакетом `com.unity.pipeline`. Proof of concept завершён: Codex получает состояние Editor, Hierarchy, Console, результаты тестов и Game View. После полного перезапуска Codex и штатного перезапуска Unity Editor соединение восстановилось автоматически. При нестабильности beta-инструмента работа над игрой продолжается через обычный Unity Editor.
+
+Полный план: [unity_codex_mcp.md](./unity_codex_mcp.md).
+
+## 9. CI и поставка
+
+Текущее состояние:
+
+- GitHub Actions автоматически проверяет только pure C# core;
+- Unity build pipeline пока не настроен;
+- автоматический деплой пока не настроен.
+
+План поставки:
+
+| Этап | Платформа | Результат |
+| --- | --- | --- |
+| MVP | Windows | Локальная development build |
+| Первая публичная версия | Windows и WebGL | Версионированные release builds |
+| Мобильная адаптация | Android | Touch input, UI scaling, performance pass |
+| Расширение | Другие платформы | Только после проверки спроса и требований магазинов |
+
+Перед публичным релизом нужно заменить `DefaultCompany`, задать application identifiers, проверить versioning, лицензии ассетов, privacy requirements и platform-specific controls.
+
+Unity Cloud Build не считается выбранным решением. Когда появятся стабильные локальные build profiles, сравниваются GitHub Actions с Unity license, Unity Build Automation и ручной подписанный релиз.
+
+## 10. Принятые решения
+
+- Ядро хранится в embedded package `com.jochen.snakegroovecore`.
+- Core не содержит ссылок на Unity и компилируется с `noEngineReferences`.
+- Основной API интеграции - `GameSession.Tick(...) -> GameTickResult`.
+- Внешние слои читают состояние через `GameSnapshot`.
+- Игровой цикл дискретный и не зависит от частоты кадров.
+- Core-тесты выполняются вне Unity и внутри Unity из одного набора исходников.
+- Unity-логика остаётся тонкой: ввод, расписание тиков, отображение и платформенные адаптеры.
+- Сложные паттерны и сторонние библиотеки добавляются по необходимости, а не заранее.
+
+## 11. Roadmap архитектуры
+
+```text
+Фаза 0: каркас репозитория и Unity-проекта                         DONE
+Фаза 1: Classic Snake MVP
+  Core package                                                   DONE
+  Core tests и GitHub Actions                                    DONE
+  Unity to Codex MCP proof of concept                            DONE
+  SnakeRunner и сцена Game                                      IN PROGRESS
+  SnakeView, FoodView, HUD                                      TODO
+  Unity integration tests и закрытие MVP                         TODO
+Фаза 2: музыкальные слои и audio events                          TODO
+Фаза 3: визуальная полировка и адаптация платформ                TODO
+Release: build profiles, QA, подпись, публикация                 TODO
+```
+
+Текущий рабочий статус ведётся в [snake_phase_1_in_progress.md](./snake_phase_1_in_progress.md).

@@ -1,49 +1,82 @@
-# Snake Groove — Core CI
+# Snake Groove - Core CI
 
-## Что проверяет CI
+> Статус: настроено и проверено. Локальный запуск и GitHub Actions проходят, 8 из 8 тестов зелёные.
 
-GitHub Actions запускает только pure C# тесты ядра, без Unity Editor.
+## Назначение
 
-Workflow:
+Core CI быстро проверяет игровое ядро без запуска Unity Editor и без Unity license. Он защищает правила движения, роста, столкновений и завершения игры при каждом `push` и `pull request`.
 
-```text
-.github/workflows/core-tests.yml
-```
-
-Тестовый проект:
+## Где находятся части системы
 
 ```text
-tests/SnakeGroove.Core.Tests/SnakeGroove.Core.Tests.csproj
+SnakeGroove/Packages/com.jochen.snakegroovecore/
+  Runtime/                         # исходный код ядра
+  Tests/Runtime/                   # единственный набор NUnit-тестов
+
+tests/SnakeGroove.Core.Tests/
+  SnakeGroove.Core.Tests.csproj    # standalone .NET 8 test host
+
+.github/workflows/
+  core-tests.yml                   # GitHub Actions workflow
 ```
 
-Этот проект:
-- компилирует runtime-файлы из `SnakeGroove/Packages/com.jochen.snakegroovecore/Runtime`;
-- переиспользует package tests из `SnakeGroove/Packages/com.jochen.snakegroovecore/Tests/Runtime`;
-- запускается обычной командой `dotnet test`;
-- не требует Unity license и Unity Test Runner.
+Тесты не дублируются. Один и тот же исходный код из package-папок компилируется двумя способами:
+
+- Unity использует `SnakeGroove.Core.asmdef` и `SnakeGroove.Core.Tests.asmdef`;
+- .NET 8 test project подключает runtime и test `.cs`-файлы через `<Compile Include=...>`.
+
+## Что проверяют 8 тестов
+
+1. Обычный тик возвращает `Continue` и корректный снимок.
+2. Команда разворота на 180 градусов игнорируется.
+3. Еда увеличивает длину и счёт и возвращает сведения о событии.
+4. Заполнение последней свободной клетки завершает уровень.
+5. Удар о стену даёт `GameOverReason.HitWall`.
+6. Удар в себя даёт `GameOverReason.HitSelf`.
+7. `GameSessionFactory` создаёт запущенную сессию с корректным снимком.
+8. Пересекающиеся стартовые сегменты отклоняются валидацией.
 
 ## Локальный запуск
+
+Из корня репозитория:
 
 ```powershell
 dotnet test tests/SnakeGroove.Core.Tests/SnakeGroove.Core.Tests.csproj
 ```
 
-## Где смотреть в GitHub
+Проект использует `net8.0`, NUnit и `Microsoft.NET.Test.Sdk`. Unity для этой команды не нужен.
 
-1. Открой репозиторий на GitHub.
-2. Перейди во вкладку **Actions**.
-3. Выбери workflow **Core Tests**.
-4. Открой последний run.
-5. В job **Pure C# Core Tests** смотри шаг **Test**.
+## Что делает GitHub Actions
 
-Если всё хорошо, run будет зелёным, а в артефактах будет `core-test-results` с `.trx` результатом тестов.
+Workflow `Core Tests` выполняет:
 
-## Что остаётся отдельно
+1. получение кода репозитория;
+2. установку .NET 8 SDK;
+3. восстановление пакетов;
+4. запуск тестов в конфигурации Release;
+5. сохранение `core-tests.trx` как артефакта `core-test-results`, даже если тесты упали.
 
-Unity package tests по-прежнему можно запускать в Unity:
+## Где смотреть результат на GitHub
 
-```text
-Window -> General -> Test Runner -> EditMode -> Run All
-```
+1. Открыть репозиторий.
+2. Перейти во вкладку **Actions**.
+3. Выбрать workflow **Core Tests**.
+4. Открыть нужный запуск.
+5. В job **Pure C# Core Tests** посмотреть шаг **Test**.
 
-Unity Test Runner в CI можно добавить позже, когда будет смысл поднимать Unity Editor в GitHub Actions.
+Зелёная галочка означает, что сборка тестового проекта и все core-тесты прошли. При ошибке подробности находятся в логе шага **Test** и в артефакте `core-test-results`.
+
+## Что этот CI пока не проверяет
+
+- компиляцию всего Unity-проекта;
+- состояние сцен, объектов и компонентов;
+- Play Mode;
+- визуализацию, ввод, звук и сборки платформ.
+
+Эти проверки остаются за Unity Test Runner и ручным Play Mode. После появления `SnakeRunner` и Unity-представления нужно добавить EditMode/PlayMode тесты. Их автоматизацию в CI следует оценивать отдельно, чтобы Unity license и тяжёлая сборка не замедляли быстрый core pipeline.
+
+## Связанные документы
+
+- [Текущая Фаза 1](./snake_phase_1_in_progress.md)
+- [Архитектура](./SNAKE_ARCHITECTURE.md)
+- [Unity to Codex MCP](./unity_codex_mcp.md)

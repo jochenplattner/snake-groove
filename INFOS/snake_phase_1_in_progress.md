@@ -1,393 +1,262 @@
-# Snake Groove — Фаза 1 (In Progress)
+# Snake Groove - Фаза 1: Classic Snake MVP
 
-## 1. Общее описание проекта
+> Статус фазы: IN PROGRESS
+>
+> Unity: `6000.3.7f1`
+>
+> Активная игровая задача: `SnakeRunner`
+>
+> Завершённая вспомогательная задача: Unity to Codex MCP proof of concept
 
-**Snake Groove** — это модульная игра в жанре Snake, построенная на принципах **Clean Architecture**.
+## 1. Цель Фазы 1
 
-Ключевая идея проекта:
-- игровая логика реализована в виде **чистого C# ядра** (без Unity-зависимостей);
-- Unity используется как слой представления и адаптации (UI, ввод, визуализация);
-- архитектура масштабируема и готова к расширению (музыка, режимы, платформы).
+Получить минимальную, но законченную классическую Snake внутри Unity:
 
-Проект развивается по фазам с фиксацией архитектурных решений в Markdown-документах.
+- пользователь запускает игру из меню;
+- змейка движется по сетке и принимает ввод;
+- еда отображается, увеличивает змейку и счёт;
+- столкновение со стеной или телом завершает игру;
+- заполнение поля завершает уровень;
+- правила игры находятся в pure C# ядре;
+- Unity отвечает за ввод, время, сцены и изображение;
+- основные сценарии ядра защищены автоматическими тестами.
 
----
+Музыкальная механика Snake Groove начнётся после закрытия этого MVP.
 
-## 2. Структура проекта
-
-### Корень
-
-```text
-Assets/
-Packages/
-ProjectSettings/
-```
-
----
-
-### Assets/
+## 2. Фактическая структура
 
 ```text
-Assets/
-  Scripts/
-    Core/           // Unity-уровень: менеджеры, загрузка, шина событий
-    UI/
-      UIScreen.cs
-      Screens/
+SnakeGroove/
+  Assets/
+    Scenes/
+      Boot.unity
+      MainMenu.unity
+      Game.unity
+    Scripts/
+      Infrastructure/
+        BootLoader.cs
+        EventBus.cs
+        GameManager.cs
+      Gameplay/                    # подготовлена для Unity-адаптеров
+      UI/Screens/
+        UIScreen.cs
         MainMenuScreen.cs
-    Gameplay/       // Unity-адаптеры к игровому ядру
-  Scenes/
-    Boot.unity
-    MainMenu.unity
-    Game.unity
+        SettingsScreen.cs
+  Packages/
+    com.jochen.snakegroovecore/
+      Runtime/
+      Tests/Runtime/
+
+tests/
+  SnakeGroove.Core.Tests/
+
+.github/workflows/
+  core-tests.yml
 ```
 
-**Назначение слоёв:**
-- **Core** — загрузка, инициализация, EventBus, GameManager
-- **UI** — экраны, кнопки, пользовательское взаимодействие
-- **Gameplay** — мост между Unity и pure C# ядром
+В Build Settings включены `Boot`, `MainMenu` и `Game`. `SampleScene` выключена.
 
----
+## 3. Выполнено
 
-### Packages/
+### 3.1 Каркас сцен и меню - DONE
+
+- подготовлен поток `Boot -> MainMenu -> Game`;
+- `GameManager` живёт между сценами;
+- `BootLoader` загружает главное меню;
+- создан базовый `UIScreen`;
+- создан `MainMenuScreen` с обработчиками Start, Settings и Exit;
+- создан `SettingsScreen`;
+- меню использует Canvas и EventSystem.
+
+### 3.2 Pure C# ядро - DONE
+
+Embedded package: `com.jochen.snakegroovecore`.
+
+Ядро умеет:
+
+- хранить клеточные координаты и размер поля;
+- создавать змейку с валидной начальной конфигурацией;
+- запрещать разворот на 180 градусов;
+- выполнять один игровой тик;
+- определять поедание еды;
+- увеличивать длину и счёт;
+- создавать новую еду в свободной клетке;
+- определять `HitWall` и `HitSelf`;
+- возвращать `LevelComplete`, когда свободных клеток не осталось;
+- отдавать внешнему слою read-only `GameSnapshot`.
+
+Публичная точка интеграции:
 
 ```text
-Packages/
-  com.jochen.snakegroovecore/
-    Runtime/
-      GridPosition.cs
-      GridSize.cs
-      Direction.cs
-      DirectionExtensions.cs
-      Snake.cs
-      Food.cs
-      FoodSpawner.cs
-      GameRules.cs
-      GameConfig.cs
-      GameSession.cs
-      GameSessionFactory.cs
-      GameSnapshot.cs
-      GameStatus.cs
-      GameState.cs
-      GameLoopService.cs
-      GameTickResult.cs
-      GameOverReason.cs
-      TickResult.cs
+GameSessionFactory
+  -> GameSession
+  -> GameSession.Tick(Direction?)
+  -> GameTickResult
+  -> GameSnapshot
 ```
 
-📌 Ядро игры оформлено как **embedded package**, не зависящий от Unity.
+Unity не должна изменять `GameState` напрямую и не должна повторять правила ядра.
 
----
+### 3.3 Core-тесты и GitHub Actions - DONE
 
-## 3. Фаза 1 — выполненные шаги
+Реализованы:
 
-### ✅ 2.1 Canvas и EventSystem
+- Unity package test assembly `SnakeGroove.Core.Tests`;
+- standalone .NET 8 test project `tests/SnakeGroove.Core.Tests`;
+- общий набор из 8 NUnit-тестов;
+- GitHub Actions workflow `.github/workflows/core-tests.yml`;
+- запуск на каждом `push` и `pull_request`;
+- сохранение TRX-результата как GitHub artifact.
 
-- Canvas_MainMenu (Overlay)
-- Canvas Scaler (1920×1080, Match 0.5)
-- Один EventSystem
+Проверенные сценарии:
 
-**Статус:** DONE
+1. обычное движение;
+2. запрет разворота на 180 градусов;
+3. еда, рост и счёт;
+4. `LevelComplete`;
+5. столкновение со стеной;
+6. столкновение с собой;
+7. создание стандартной сессии;
+8. отказ при пересечении стартовых сегментов.
 
----
+Локальный результат: 8 из 8 тестов проходят. GitHub Actions: зелёный.
 
-### ✅ 2.2 UI-иерархия
+Подробнее: [core_ci.md](./core_ci.md).
 
-```text
-Canvas_MainMenu
-  UI_Root
-    Screen_MainMenu
-      MenuContainer
-        Button_Start
-        Button_Settings
-        Button_Exit
-```
+## 4. Текущие задачи
 
-- Используется Layout Element
-- Кнопки кликабельны
+### 4.1 Unity to Codex MCP - DONE, вспомогательная задача 3.4
 
-**Статус:** DONE
+Цель - дать Codex контролируемый доступ к открытому Unity Editor:
 
----
+- читать активную сцену, Hierarchy и компоненты;
+- читать Console и ошибки компиляции;
+- обновлять Asset Database и ждать окончания компиляции;
+- запускать EditMode/PlayMode tests;
+- управлять Play Mode;
+- получать снимок Game View.
 
-### ✅ 2.3 UIScreen + MainMenuScreen
+Выбран официальный Unity CLI с `unity mcp`. Инструмент не становится runtime-зависимостью игры: если beta-интеграция окажется нестабильной, `SnakeRunner` продолжаем делать обычным способом.
 
-**UIScreen.cs**
-- Базовый класс экранов
-- Методы Show / Hide
-- Namespace: `SnakeGroove.UI`
+Текущее состояние:
 
-**MainMenuScreen.cs**
-- Наследуется от UIScreen
-- Обработчики:
-  - OnStartClicked
-  - OnSettingsClicked
-  - OnExitClicked
-- Висит на `Screen_MainMenu`
-- Namespace: `SnakeGroove.UI.Screens`
+- Unity CLI `1.0.0-beta.8` установлен вместе с Unity Hub;
+- проектный Unity MCP настроен для Codex;
+- `com.unity.pipeline` `0.8.0-exp.1` подключён;
+- Editor, Hierarchy, Console, Play Mode и Game View доступны через Pipeline;
+- все 8 EditMode-тестов проходят через новое подключение;
+- write/Undo smoke test не оставил изменений в сцене;
+- после полного перезапуска Codex нативные Unity MCP tools загрузились в новую сессию;
+- после штатного перезапуска Unity Editor соединение восстановилось автоматически;
+- повторная проверка `MainMenu.unity`, Hierarchy и Console прошла без ошибок и изменений сцены.
 
-Кнопки перепривязаны через **Scene**, не через Assets.
+План и критерии готовности: [unity_codex_mcp.md](./unity_codex_mcp.md).
 
-**Статус:** DONE
+### 4.2 SnakeRunner - IN PROGRESS, игровая задача 4
 
----
+Цель - связать сцену `Game` с готовым ядром.
 
-### ✅ 3. Snake Core (pure C#)
+Минимальная реализация:
 
-Реализовано автономное игровое ядро без зависимости от Unity.
+1. создать `Assets/Scripts/Gameplay/SnakeRunner.cs`;
+2. создать `GameSession` через `GameSessionFactory.CreateClassicDefault(...)`;
+3. читать стрелки и WASD через установленный Input System;
+4. сохранять последнее запрошенное направление;
+5. вызывать `GameSession.Tick(...)` по независимому от FPS таймеру;
+6. публиковать или передавать `GameTickResult` представлению;
+7. временно выводить в Console позицию головы, счёт и исход тика;
+8. останавливать тики при `GameOver` или `LevelComplete`;
+9. подключить компонент к объекту `GameController` в `Game.unity`.
 
-Основные элементы ядра:
+Критерий готовности:
 
-- `GridPosition`
-  - позиция на сетке;
-  - используется для координат головы, тела змейки и еды.
+- проект компилируется без ошибок;
+- в Play Mode змейка логически двигается;
+- направление меняется корректно;
+- Console показывает изменение snapshot;
+- исходы `GameOver` и `LevelComplete` обрабатываются;
+- правила игры не продублированы в Unity-коде.
 
-- `GridSize`
-  - размер игрового поля;
-  - используется для проверки выхода за границы.
+## 5. Следующие задачи
 
-- `Direction`
-  - направления движения змейки;
-  - поддерживается проверка противоположного направления.
+### 5.1 Визуализация - TODO, задача 5
 
-- `DirectionExtensions`
-  - преобразование направления в смещение по сетке;
-  - логика определения противоположных направлений.
-
-- `Snake`
-  - хранит список сегментов;
-  - голова находится в индексе `0`;
-  - умеет двигаться через `Move()`;
-  - умеет расти через `Grow(int amount = 1)`;
-  - запрещает разворот на 180 градусов через `ChangeDirection()`.
-
-- `Food`
-  - хранит позицию еды на поле;
-  - содержит `ScoreValue` и `GrowthAmount`.
-
-- `FoodSpawner`
-  - создаёт новую еду;
-  - учитывает занятые змейкой клетки;
-  - поддерживает `TrySpawn(...)`, чтобы заполненное поле стало `LevelComplete`, а не техническим исключением.
-
-- `GameConfig`
-  - хранит размер поля, стартовые сегменты змейки, направление, скорость тика и optional seed;
-  - валидирует стартовую конфигурацию.
-
-- `GameSessionFactory`
-  - создаёт полностью связанную игровую сессию;
-  - скрывает ручную сборку `Snake`, `FoodSpawner`, `GameState`, `GameLoopService`.
-
-- `GameSession`
-  - публичный facade для Unity-адаптера;
-  - отдаёт `Snapshot`;
-  - выполняет `Tick(Direction?)`.
-
-- `GameSnapshot`
-  - read-only снимок состояния для UI, View и Debug.Log;
-  - защищает ядро от случайной мутации Unity-слоем.
-
-- `GameRules`
-  - проверка выхода за границы;
-  - проверка столкновения змейки с собой;
-  - учитывает возможность прохода через хвост, если хвост освобождается на этом тике.
-
-- `GameState`
-  - хранит `GridSize`;
-  - хранит `Snake`;
-  - хранит текущую `Food`;
-  - хранит `Score`;
-  - хранит `Status`;
-  - хранит `GameOverReason`;
-  - публичных setters нет: состояние меняется только методами ядра.
-
-- `GameLoopService`
-  - выполняет один игровой тик через `Tick(Direction? inputDirection = null)`;
-  - применяет ввод игрока;
-  - вычисляет следующую позицию головы;
-  - проверяет выход за границы;
-  - определяет, будет ли съедена еда;
-  - проверяет self-collision;
-  - применяет `GrowthAmount` и `ScoreValue` съеденной еды;
-  - спаунит новую еду через `TrySpawn(...)`;
-  - завершает уровень как `LevelComplete`, если свободных клеток не осталось;
-  - возвращает `GameTickResult`.
-
-- `GameOverReason`
-  - `None`;
-  - `HitWall`;
-  - `HitSelf`.
-
-- `TickResult`
-  - `Continue`;
-  - `AteFood`;
-  - `GameOver`;
-  - `LevelComplete`.
-
-- `GameTickResult`
-  - содержит `Outcome`, `ScoreDelta`, `EatenFood`, `SpawnedFood`, `GameOverReason`, `Snapshot`;
-  - является основным ответом ядра на один тик.
-
-**Ключевое архитектурное решение:**
-- ядро остаётся полностью независимым от Unity;
-- Unity-слой в дальнейшем будет только создавать `GameSession`, передавать ввод, вызывать `Tick()` и отображать `GameSnapshot`.
-
-**Коммит:** `Phase1-3: Snake Core`
-
-**Статус:** DONE
-
----
-
-## 4. Активные задачи (In Progress)
-
-### 🔄 Пункт 4 — SnakeRunner (Unity bridge)
-
-Следующая активная задача: связать Unity и чистое C# ядро.
-
-Цель:
-- создать Unity-адаптер, который будет принимать ввод игрока;
-- создать `GameSession` через `GameSessionFactory.CreateClassicDefault(...)`;
-- вызывать `GameSession.Tick(direction?)`;
-- передавать `GameTickResult.Snapshot` дальше в визуальный слой;
-- обрабатывать `TickResult.GameOver` и `TickResult.LevelComplete`.
-
-Минимальный план:
-- создать `SnakeRunner.cs` в `Assets/Scripts/Gameplay`;
-- создать объект `GameController` в сцене `Game.unity`;
-- повесить на него `SnakeRunner`;
-- в `Update()` читать ввод с клавиатуры;
-- по таймеру вызывать тик ядра;
-- временно выводить состояние в `Debug.Log`.
-
-**Статус:** IN PROGRESS / NEXT
-
----
-
-## 5. Следующие шаги (To Do)
-
-### ▶️ Пункт 5 — Визуализация
-
-Цель: увидеть змейку и еду в сцене `Game.unity`.
-
-План:
-- создать временный prefab сегмента змейки;
-- создать временный prefab еды;
 - реализовать перевод `GridPosition -> Vector3`;
-- создать простой `SnakeView`;
-- создать простой `FoodView`;
-- после каждого тика обновлять позиции объектов.
+- создать простой prefab сегмента;
+- создать простой prefab еды;
+- реализовать `SnakeView` и `FoodView`;
+- обновлять View из `GameSnapshot`;
+- добавить камеру и читаемое игровое поле;
+- проверить рост, новую еду и завершение игры визуально.
 
-Минимальный критерий готовности:
-- змейка визуально двигается по сетке;
-- еда отображается;
-- после съедания еды длина змейки увеличивается;
-- новая еда появляется в свободной клетке.
+### 5.2 Unity-проверки - TODO, оставшаяся часть задачи 6
 
----
+Общий статус задачи «Тесты и CI»: PARTIALLY DONE.
 
-### 🔄 Пункт 6 — Тесты и CI
+Package tests уже проходят в Unity Test Runner / EditMode: 8 из 8. Для будущего Unity-слоя остаётся:
 
-Цель: закрепить качество ядра перед усложнением проекта.
+- добавить EditMode тесты адаптеров;
+- добавить минимальный PlayMode smoke test сцены `Game`;
+- решить, оправдан ли Unity Test Runner в GitHub Actions;
+- сохранить быстрый core workflow отдельным от тяжёлого Unity pipeline.
 
-**Статус:** PARTIALLY DONE
+### 5.3 Закрытие Фазы 1 - TODO, задача 7
 
-Уже реализовано:
-- package test assembly `SnakeGroove.Core.Tests`;
-- standalone .NET test project `tests/SnakeGroove.Core.Tests`;
-- `GameLoopServiceTests`;
-- `GameSessionFactoryTests`;
-- тест обычного движения;
-- тест поедания еды, роста и счёта;
-- тест `LevelComplete`;
-- тест `HitWall`;
-- тест запрета разворота на 180 градусов;
-- тест self-collision → `GameOverReason.HitSelf`;
-- тест валидации пересекающихся стартовых сегментов;
-- GitHub Actions workflow `.github/workflows/core-tests.yml` для pure C# core-тестов;
-- локальная проверка `dotnet test tests/SnakeGroove.Core.Tests/SnakeGroove.Core.Tests.csproj` проходит: 8/8 tests passed.
+Фаза закрывается, когда:
 
-Осталось:
-- прогнать package tests через Unity Test Runner / EditMode;
-- проверить первый GitHub Actions run после push / pull request;
-- позже решить, добавлять ли Unity Test Runner в CI.
+- меню запускает игровую сцену;
+- `SnakeRunner` управляет core-сессией;
+- змейка и еда видимы;
+- счёт и рост работают;
+- `HitWall`, `HitSelf` и `LevelComplete` видны пользователю;
+- core CI остаётся зелёным;
+- Unity tests и ручной smoke test проходят;
+- создаётся `snake_phase_1_summary.md`;
+- при необходимости создаётся tag `v0.1`.
 
-План CI:
-- на первом этапе запускать `dotnet test` для standalone pure C# test project;
-- при возможности добавить запуск Unity Test Runner / EditMode package tests;
-- запускать проверки на push / pull request.
+## 6. Что не входит в Фазу 1
 
----
+- музыкальные слои и синхронизация с ритмом;
+- сложные типы еды и power-ups;
+- сохранение прогресса;
+- онлайн-функции;
+- multiplayer;
+- магазин и монетизация;
+- финальная графика;
+- публикация в stores.
 
-### ▶️ Пункт 7 — Закрытие Фазы 1
+Эти задачи не должны усложнять `SnakeRunner` и первую визуализацию.
 
-Цель: зафиксировать завершение Classic Snake MVP.
+## 7. План после MVP
 
-План:
-- обновить `snake_phase_1_in_progress.md`;
-- создать `snake_phase_1_summary.md`;
-- описать, что сделано:
-  - UI foundation;
-  - Snake Core;
-  - SnakeRunner;
-  - визуализация;
-  - тесты;
-  - CI;
-- отдельно указать, что музыка, настройки и расширенные режимы переносятся в следующие фазы;
-- сделать финальный коммит Фазы 1;
-- по желанию создать tag `phase-1` или `v0.1`.
+```text
+Фаза 2
+  -> события еды для Audio layer
+  -> музыкальные дорожки и AudioMixer
+  -> настройки громкости
 
----
+Фаза 3
+  -> визуальный стиль, анимации, VFX
+  -> touch input и адаптивный UI
+  -> производительность и accessibility
 
-## 6. Архитектурные принципы проекта
+Release
+  -> Windows build
+  -> WebGL build
+  -> Android build
+  -> platform QA
+  -> versioning, signing, store metadata и публикация
+```
 
-- Clean Architecture
-- Разделение логики и представления
-- EventBus для коммуникации на Unity-уровне
-- Unity как адаптер, а не источник игровой логики
-- Embedded package для ядра
-- Pure C# core без `UnityEngine`
-- Движение игры через tick-based loop
-- Минимизация логики внутри MonoBehaviour
+## 8. Следующий практический маршрут
 
----
+```text
+1. Реализовать SnakeRunner.
+2. Использовать Unity MCP для проверки сцены, Console и Play Mode.
+3. Убедиться, что сессия тикает в Play Mode.
+4. Реализовать SnakeView и FoodView.
+5. Добавить Unity integration tests.
+6. Закрыть Фазу 1.
+```
 
-## 7. Предложения по улучшению (на будущее)
-
-- Ввести `UIScreenManager` для переключения экранов
-- Добавить `SettingsScreen` как второй экран
-- Расширить UIScreen анимациями (fade / slide)
-- Раннее подключение аудио-слоя (`AudioLayerManager`)
-- Покрыть Snake Core тестами до усложнения логики
-- Расширить package tests новыми сценариями для еды и seed-based random
-- Добавить CI-запуск Unity Test Runner / package tests
-- Подумать над event-механизмом поверх `GameTickResult` для UI и Audio слоя
-- В будущем вынести разные типы еды и эффектов через Strategy / Factory
-
----
-
-## 8. Статус Фазы 1
-
-- UI foundation: ✅ завершён
-- Snake Core: ✅ завершён
-- Unity bridge / SnakeRunner: 🔄 следующий активный шаг
-- Интеграция с Game-сценой: ⏳ впереди
-- Визуализация: ⏳ впереди
-- Unit-тесты: ✅ базовый набор готов
-- CI: 🔄 core workflow настроен, ждёт проверки на GitHub
-- Phase 1 summary: ⏳ впереди
-
-📌 Этот файл является **центральной точкой отсчёта Фазы 1** и используется как база для всех дальнейших чатов и решений.
-
----
-
-## 9. Следующий практический шаг
-
-Следующий рабочий шаг:
-
-> **Пункт 4 — создать `SnakeRunner.cs` и связать Unity с Snake Core.**
-
-Цель ближайшей итерации:
-
-> **Start → Game.unity → SnakeRunner создаёт GameSession через GameSessionFactory → GameSession.Tick() возвращает GameTickResult → Snapshot выводится в Debug.Log / визуальный слой.**
-
-После этого проект перейдёт от “ядро готово” к “игра начала жить внутри Unity”.
+Архитектурные границы описаны в [SNAKE_ARCHITECTURE.md](./SNAKE_ARCHITECTURE.md).
